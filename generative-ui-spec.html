@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>生成式 UI 技术方案 — A2UI vs json-render</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --bg2: #ffffff;
+      --bg3: #f0f4f8;
+      --border: #e2e8f0;
+      --border2: #cbd5e1;
+      --text: #1e293b;
+      --muted: #64748b;
+      --light: #94a3b8;
+      --accent-a: #6366f1;
+      --accent-b: #0891b2;
+      --accent-green: #059669;
+      --accent-yellow: #d97706;
+      --a2ui: #4f46e5;
+      --jr: #059669;
+      --a2ui-bg: #eef2ff;
+      --jr-bg: #ecfdf5;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #4f46e5 0%, #0891b2 100%);
+      padding: 40px 32px 36px;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: clamp(22px, 3.5vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .header .subtitle {
+      margin-top: 10px;
+      color: rgba(255,255,255,0.75);
+      font-size: 15px;
+    }
+    .tags {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .tag-a { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.35); }
+    .tag-b { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.25); }
+    .tag-c { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.2); }
+
+    /* ── Main Layout ── */
+    .main-layout {
+      display: flex;
+      gap: 0;
+      min-height: calc(100vh - 180px);
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    /* ── Left: Flow ── */
+    .flow-sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 24px;
+    }
+    .flow-sidebar-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--light);
+      margin-bottom: 16px;
+      padding-left: 4px;
+    }
+
+    .flow-list {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .flow-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      position: relative;
+    }
+
+    /* vertical line connector */
+    .flow-item:not(:last-child) .flow-line {
+      position: absolute;
+      left: 19px;
+      top: 44px;
+      width: 2px;
+      height: calc(100% - 16px);
+      background: var(--border2);
+      z-index: 0;
+    }
+    .flow-item.active:not(:last-child) .flow-line,
+    .flow-item.done:not(:last-child) .flow-line {
+      background: var(--accent-a);
+    }
+
+    .flow-dot-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 40px;
+      position: relative;
+      z-index: 1;
+    }
+    .flow-dot {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--bg2);
+      border: 2px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .flow-item.active .flow-dot {
+      background: var(--accent-a);
+      border-color: var(--accent-a);
+      box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
+    }
+    .flow-item.active .flow-dot .dot-icon { filter: brightness(10); }
+
+    .flow-node-btn {
+      flex: 1;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.18s;
+      text-align: left;
+      margin-bottom: 10px;
+      margin-left: 10px;
+    }
+    .flow-node-btn:hover {
+      border-color: var(--accent-a);
+      background: var(--a2ui-bg);
+    }
+    .flow-node-btn.active {
+      border-color: var(--accent-a);
+      background: var(--a2ui-bg);
+      box-shadow: 0 2px 12px rgba(99,102,241,0.12);
+    }
+    .node-num {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: var(--light);
+      margin-bottom: 2px;
+    }
+    .flow-node-btn.active .node-num { color: var(--accent-a); }
+    .node-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .node-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    /* ── Right: Detail ── */
+    .detail-area {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .detail-placeholder {
+      background: var(--bg2);
+      border: 2px dashed var(--border2);
+      border-radius: 16px;
+      padding: 60px 32px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .detail-placeholder .ph-icon { font-size: 40px; margin-bottom: 14px; }
+    .detail-placeholder p { font-size: 15px; }
+
+    .detail-panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .detail-panel h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .detail-panel .detail-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Comparison Table ── */
+    .cmp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    .cmp-table thead tr {
+      background: var(--bg3);
+    }
+    .cmp-table th {
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: left;
+      border-bottom: 2px solid var(--border2);
+    }
+    .cmp-table th:nth-child(1) { color: var(--muted); width: 20%; }
+    .cmp-table th:nth-child(2) { color: var(--a2ui); }
+    .cmp-table th:nth-child(3) { color: var(--jr); }
+    .cmp-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+    .cmp-table tr:last-child td { border-bottom: none; }
+    .cmp-table td:nth-child(1) {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 12px;
+      background: #fafbfc;
+    }
+    .cmp-table td:nth-child(2) { background: #fafbff; }
+    .cmp-table td:nth-child(3) { background: #f9fffb; }
+    .cmp-table tr:hover td:nth-child(2) { background: var(--a2ui-bg); }
+    .cmp-table tr:hover td:nth-child(3) { background: var(--jr-bg); }
+    .cmp-table tr:hover td:nth-child(1) { background: #f5f6f7; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+    .badge-good { background: #dcfce7; color: #15803d; }
+    .badge-warn { background: #fef3c7; color: #92400e; }
+    .badge-info { background: #e0e7ff; color: #3730a3; }
+
+    /* ── Code ── */
+    .code-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .code-block { }
+    .code-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .code-label::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .code-label.a { color: var(--a2ui); }
+    .code-label.a::before { background: var(--a2ui); }
+    .code-label.b { color: var(--jr); }
+    .code-label.b::before { background: var(--jr); }
+
+    pre {
+      background: #1e2433;
+      border-radius: 10px;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.7;
+      font-family: "JetBrains Mono", "Fira Code", "SF Mono", monospace;
+      color: #e2e8f0;
+    }
+
+    /* ── Bottom Summary ── */
+    .bottom-section {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--light);
+      margin-bottom: 20px;
+      padding-left: 4px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .summary-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .summary-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .summary-card.a { border-top: 3px solid var(--a2ui); }
+    .summary-card.b { border-top: 3px solid var(--jr); }
+    .summary-card.a h3 { color: var(--a2ui); }
+    .summary-card.b h3 { color: var(--jr); }
+    .pro-list { list-style: none; }
+    .pro-list li {
+      padding: 5px 0;
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .pro-list li::before { content: "•"; flex-shrink: 0; margin-top: 1px; font-size: 14px; }
+    .summary-card.a .pro-list li::before { color: var(--a2ui); }
+    .summary-card.b .pro-list li::before { color: var(--jr); }
+
+    .scenario-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .scenario {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 13px;
+    }
+    .scenario h4 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: var(--text); }
+    .scenario p { color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .scenario .rec { margin-top: 12px; font-weight: 700; font-size: 12px; display: inline-block; padding: 3px 10px; border-radius: 6px; }
+    .rec.a { background: var(--a2ui-bg); color: var(--a2ui); }
+    .rec.b { background: var(--jr-bg); color: var(--jr); }
+    .rec.ab { background: #fffbeb; color: var(--accent-yellow); }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .anim { animation: fadeIn 0.2s ease; }
+
+    @media (max-width: 900px) {
+      .main-layout { flex-direction: column; }
+      .flow-sidebar { width: 100%; position: static; }
+      .flow-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .flow-item:not(:last-child) .flow-line { display: none; }
+      .flow-dot-wrap { display: none; }
+      .flow-node-btn { margin-left: 0; margin-bottom: 0; }
+      .code-grid { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .scenario-row { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .scenario-row { grid-template-columns: 1fr; }
+      .flow-list { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>生成式 UI 技术方案</h1>
+  <p class="subtitle">主流程 · A2UI vs json-render · 环节对比</p>
+  <div class="tags">
+    <span class="tag tag-a">🔷 A2UI — Google</span>
+    <span class="tag tag-b">🟢 json-render — Vercel Labs</span>
+    <span class="tag tag-c">Generative UI</span>
+  </div>
+</div>
+
+<div class="main-layout">
+
+  <!-- Left: Flow -->
+  <div class="flow-sidebar">
+    <div class="flow-sidebar-title">主流程 — 点击查看对比</div>
+    <div class="flow-list" id="flowList">
+
+      <div class="flow-item" data-step="0">
+        <div class="flow-line"></div>
+        <div class="flow-dot-wrap">
+          <div class="flow-dot"><span class="dot-icon">🧩</span></div>
+        </div>
+        <button class="flow-node-btn" onclick="showStep(0)">
+          <div class="node-num">STEP 01</div>
+          <div class="node-title">Catalog / Registry</div>
+          <div class="node-sub">组件白名单定义 · 安全边界</div>
+        </button>
+      </div>
+
+      <div class="flow-item" data-step="1">
+        <div class="flow-line"></div>
+        <div class="flow-dot-wrap">
+          <div class="flow-dot"><span class="dot-icon">🧠</span></div>
+        </div>
+        <button class="flow-node-btn" onclick="showStep(1)">
+          <div class="node-num">STEP 02</div>
+          <div class="node-title">意图理解（NLU）</div>
+          <div class="node-sub">AI 拆解自然语言意图</div>
+        </button>
+      </div>
+
+      <div class="flow-item" data-step="2">
+        <div class="flow-line"></div>
+        <div class="flow-dot-wrap">
+          <div class="flow-dot"><span class="dot-icon">🤖</span></div>
+        </div>
+        <button class="flow-node-btn" onclick="showStep(2)">
+          <div class="node-num">STEP 03</div>
+          <div class="node-title">LLM 生成 JSON Spec</div>
+          <div class="node-sub">AI 输出结构化 UI 描述</div>
+        </button>
+      </div>
+
+      <div class="flow-item" data-step="3">
+        <div class="flow-line"></div>
+        <div class="flow-dot-wrap">
+          <div class="flow-dot"><span class="dot-icon">📡</span></div>
+        </div>
+        <button class="flow-node-btn" onclick="showStep(3)">
+          <div class="node-num">STEP 04</div>
+          <div class="node-title">传输层 · 流式下发</div>
+          <div class="node-sub">服务端推送到客户端</div>
+        </button>
+      </div>
+
+      <div class="flow-item" data-step="4">
+        <div class="flow-line"></div>
+        <div class="flow-dot-wrap">
+          <div class="flow-dot"><span class="dot-icon">⚙️</span></div>
+        </div>
+        <button class="flow-node-btn" onclick="showStep(4)">
+          <div class="node-num">STEP 05</div>
+          <div class="node-title">解析 &amp; 编译</div>
+          <div class="node-sub">Spec → 组件树 · 增量更新</div>
+        </button>
+      </div>
+
+      <div class="flow-item" data-step="5">
+        <div class="flow-line"></div>
+        <div class="flow-dot-wrap">
+          <div class="flow-dot"><span class="dot-icon">🗄️</span></div>
+        </div>
+        <button class="flow-node-btn" onclick="showStep(5)">
+          <div class="node-num">STEP 06</div>
+          <div class="node-title">数据绑定</div>
+          <div class="node-sub">State / DataModel 注入</div>
+        </button>
+      </div>
+
+      <div class="flow-item" data-step="6">
+        <div class="flow-line"></div>
+        <div class="flow-dot-wrap">
+          <div class="flow-dot"><span class="dot-icon">🖥️</span></div>
+        </div>
+        <button class="flow-node-btn" onclick="showStep(6)">
+          <div class="node-num">STEP 07</div>
+          <div class="node-title">渲染层</div>
+          <div class="node-sub">原生组件 · 跨平台渲染</div>
+        </button>
+      </div>
+
+      <div class="flow-item" data-step="7">
+        <div class="flow-dot-wrap">
+          <div class="flow-dot"><span class="dot-icon">🖱️</span></div>
+        </div>
+        <button class="flow-node-btn" onclick="showStep(7)">
+          <div class="node-num">STEP 08</div>
+          <div class="node-title">用户交互回传</div>
+          <div class="node-sub">Action → 新一轮 AI 响应</div>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Right: Detail -->
+  <div class="detail-area" id="detailArea">
+    <div class="detail-placeholder">
+      <div class="ph-icon">👈</div>
+      <p>点击左侧任意流程节点<br/>查看 A2UI 与 json-render 的详细差异</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom Summary -->
+<div class="bottom-section">
+  <hr class="divider" />
+  <p class="section-title">各自优势</p>
+  <div class="summary-grid">
+    <div class="summary-card a">
+      <h3>🔷 A2UI — Google</h3>
+      <ul class="pro-list">
+        <li>跨平台原生渲染（Web / iOS / Android / Flutter）</li>
+        <li>协议级标准，与框架、传输层完全解耦</li>
+        <li>邻接表 + 多消息类型，LLM 流式生成友好</li>
+        <li>数据与结构分离，服务端独立推送 DataModel</li>
+        <li>白名单 Catalog 作为安全边界（JSON Schema 标准）</li>
+        <li>标准化 userAction 交互闭环，Agent 感知用户操作</li>
+      </ul>
+    </div>
+    <div class="summary-card b">
+      <h3>🟢 json-render — Vercel Labs</h3>
+      <ul class="pro-list">
+        <li>React 专用，快速落地，上手成本低</li>
+        <li>嵌套树结构 + Zod 类型验证，开发体验好</li>
+        <li>createSpecStreamCompiler 处理不完整 JSON 流</li>
+        <li>客户端本地 State，$bindState 双向绑定，无需服务端参与</li>
+        <li>catalog.prompt() 自动生成 LLM System Prompt</li>
+        <li>轻量灵活，无需完整协议栈</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="section-title">场景选型建议</p>
+  <div class="scenario-row">
+    <div class="scenario">
+      <h4>🌐 Web 端快速验证</h4>
+      <p>React 项目，快速跑通 AI 生成 UI 流程，无跨平台需求</p>
+      <span class="rec b">推荐 json-render</span>
+    </div>
+    <div class="scenario">
+      <h4>📱 跨平台 Agent App</h4>
+      <p>同一套 AI UI 需跑在 Web + iOS + Android，安全性要求高</p>
+      <span class="rec a">推荐 A2UI</span>
+    </div>
+    <div class="scenario">
+      <h4>🏗️ 长期规模化系统</h4>
+      <p>先用 json-render 验证，按 A2UI 标准设计 Catalog，保留迁移能力</p>
+      <span class="rec ab">A2UI Catalog + json-render Renderer</span>
+    </div>
+    <div class="scenario">
+      <h4>🔗 多 Agent 协作系统</h4>
+      <p>Agent 运行在远端，UI 需实时响应，搭配 AG-UI 传输层</p>
+      <span class="rec a">推荐 A2UI + AG-UI</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const steps = [
+  {
+    icon: "🧩", title: "Catalog / Component Registry", sub: "组件白名单定义 · AI 安全边界 · Step 01",
+    rows: [
+      ["定义方式", "JSON Schema 文件（<code>standard_catalog_definition.json</code>）", "TypeScript + Zod（<code>catalog.ts</code>）"],
+      ["验证机制", "JSON Schema 规范校验", "Zod 运行时类型验证，类型错误在 Registry 层拦截"],
+      ["组件范围", "官方标准 Catalog（Text/Card/Button/List/Modal...）可扩展", "完全自定义，无内置标准组件，开发者自行定义"],
+      ["AI 感知方式", "声明 <code>catalogId</code>（如 <code>a2ui.dev:standard</code>）", "<code>catalog.prompt()</code> 自动生成 LLM System Prompt"],
+      ["安全模型", "<span class='badge badge-good'>最高</span> 协议级白名单，Agent 无法发送白名单之外的组件", "<span class='badge badge-info'>中</span> 依赖 Zod 校验拦截，框架层保障"],
+    ],
+    codeA: `// A2UI: JSON Schema 定义 Catalog
+{
+  "$defs": {
+    "anyComponent": {
+      "oneOf": [
+        { "$ref": "#/$defs/Text" },
+        { "$ref": "#/$defs/Card" },
+        { "$ref": "#/$defs/Button" }
+      ]
+    }
+  }
+}`,
+    codeB: `// json-render: TypeScript + Zod
+import { defineCatalog } from "@json-render/core";
+import { schema } from "@json-render/react/schema";
+import { z } from "zod";
+
+export const catalog = defineCatalog(schema, {
+  components: {
+    Card: {
+      props: z.object({ title: z.string() }),
+      description: "A card container",
+    },
+    Button: {
+      props: z.object({ label: z.string() }),
+      description: "A clickable button",
+    },
+  },
+});`
+  },
+  {
+    icon: "🧠", title: "意图理解（NLU）", sub: "AI 拆解自然语言 · 提取意图、实体与交互需求 · Step 02",
+    rows: [
+      ["核心任务", "理解用户自然语言，提取意图（Intent）、实体（Entity）和交互需求", "同左，由 LLM 在一次推理中完成意图理解和 Spec 生成"],
+      ["独立性", "<span class='badge badge-info'>逻辑独立</span> 协议不涉及 NLU，但实际由 LLM 内部隐式完成", "<span class='badge badge-info'>隐含环节</span> 与 Spec 生成合并在一次 LLM 调用中"],
+      ["System Prompt", "Catalog JSON Schema 作为 System Prompt 的一部分，约束 LLM 输出", "<code>catalog.prompt()</code> 自动生成，包含组件名、props schema、可用 actions"],
+      ["意图拆解示例", '"帮我查苹果股票" → 意图: 查询股票, 实体: AAPL, 交互: 刷新/加自选', '同左，LLM 理解后直接输出包含 Metric + Button 的 Spec'],
+      ["多轮对话", "支持上下文（消息历史 + DataModel 状态）驱动多轮意图理解", "支持上下文（消息历史），但 State 在客户端，需开发者手动传入"],
+      ["可扩展性", "可接入外部 NLU 服务做预处理，再传给 LLM 生成 Spec", "可在调用 LLM 前做预处理，框架不限制"],
+    ],
+    codeA: `// A2UI: LLM 接收 Catalog + 用户意图，一次推理
+// System Prompt 包含 Catalog 定义
+const systemPrompt = \`
+你是一个 UI 生成 Agent。
+可用组件 Catalog: a2ui.dev:standard
+组件列表: Text, Card, Button, List, Metric...
+
+用户会用自然语言描述需求，你需要：
+1. 理解用户意图（查询、操作、展示...）
+2. 提取关键实体（股票代码、用户名...）
+3. 生成 A2UI JSON 消息
+\`;
+
+// User: "帮我查一下苹果股票"
+// LLM 内部: 意图=查询股票, 实体=AAPL
+// 输出: updateComponents + updateDataModel`,
+    codeB: `// json-render: catalog.prompt() 自动生成 System Prompt
+const systemPrompt = catalog.prompt();
+// 自动包含:
+// - 可用组件: Card, Metric, Button...
+// - 各组件 props schema (Zod → JSON Schema)
+// - 可用 actions: export_report, refresh_data...
+// - 输出格式: { root, elements } 结构说明
+
+// User: "帮我查一下苹果股票"
+// LLM 内部: 意图=查询股票, 实体=AAPL
+// 一次性输出完整 Spec:
+// { root: "card", elements: { card: { type: "Card", ... } } }`
+  },
+  {
+    icon: "🤖", title: "LLM 生成 JSON UI Spec", sub: "AI 输出结构化 UI 描述 · 核心输出 · Step 03",
+    rows: [
+      ["JSON 结构", "<span class='badge badge-info'>邻接表</span> 拍平列表 + ID 引用，每个组件独立一行", "<span class='badge badge-info'>嵌套树</span> root + elements Map，children 是 ID 数组"],
+      ["消息类型", "多条消息：<code>createSurface</code> / <code>updateComponents</code> / <code>updateDataModel</code>", "单一 Spec 对象，一次输出"],
+      ["数据与结构", "<span class='badge badge-good'>分离</span> 结构和数据分两条消息，可独立更新", "合并，数据直接内联 props 或通过 <code>$state</code> 引用"],
+      ["LLM 友好度", "<span class='badge badge-good'>高</span> 邻接表逐步生成，不易出现括号错配", "<span class='badge badge-info'>中</span> 嵌套直观，深层嵌套对 LLM 有挑战"],
+      ["token 消耗", "字段名较多（id/component/children/explicitList），略多", "结构简洁，token 相对较少"],
+    ],
+    codeA: `// A2UI: 邻接表结构
+{
+  "updateComponents": {
+    "surfaceId": "main",
+    "components": [
+      { "id": "root",  "component": { "Column":
+          { "children": { "explicitList": ["title","btn"] } } } },
+      { "id": "title", "component": { "Text":
+          { "text": { "literalString": "Hello" } } } },
+      { "id": "btn",   "component": { "Button":
+          { "action": { "name": "confirm" } } } }
+    ]
+  }
+}`,
+    codeB: `// json-render: 嵌套树
+{
+  "root": "root",
+  "elements": {
+    "root": {
+      "type": "Column",
+      "props": {},
+      "children": ["title", "btn"]
+    },
+    "title": {
+      "type": "Text",
+      "props": { "content": "Hello" },
+      "children": []
+    },
+    "btn": {
+      "type": "Button",
+      "props": { "label": "Confirm" },
+      "children": []
+    }
+  }
+}`
+  },
+  {
+    icon: "📡", title: "传输层 · 流式下发", sub: "JSON 从服务端推送到客户端 · Step 04",
+    rows: [
+      ["传输格式", "<span class='badge badge-info'>JSONL</span> 逐行 JSON，每行一条完整消息", "无规定，通常直接 SSE 字符流（token 级别）"],
+      ["流式粒度", "<span class='badge badge-good'>消息级</span> 每条消息独立完整，易解析", "字符级，LLM token 流，需要编译器拼接不完整 JSON"],
+      ["协议绑定", "<span class='badge badge-good'>协议无关</span> 可走 A2A / AG-UI / SSE / WebSocket", "无规定，开发者自行选择传输方式"],
+      ["搭配协议", "推荐配合 AG-UI 作为事件总线，自动处理状态同步", "框架不涉及传输层，通常直接 fetch + ReadableStream"],
+      ["增量能力", "原生支持增量消息（仅发送变化的组件/数据）", "通过 JSON Patch 实现，或全量替换"],
+    ],
+    codeA: `// A2UI: JSONL 逐行消息（每行独立完整）
+{"createSurface":{"surfaceId":"main","catalogId":"standard"}}
+{"updateComponents":{"surfaceId":"main","components":[...]}}
+{"updateDataModel":{"surfaceId":"main","path":"/user","value":{"name":"Alice"}}}`,
+    codeB: `// json-render: SSE 字符流 + 编译器拼接
+const response = await fetch("/api/generate");
+const reader = response.body.getReader();
+const decoder = new TextDecoder();
+
+while (true) {
+  const { done, value } = await reader.read();
+  if (done) break;
+  const chunk = decoder.decode(value);
+  const { result } = compiler.push(chunk);
+  setSpec(result); // 不完整 JSON 也能渐进渲染
+}`
+  },
+  {
+    icon: "⚙️", title: "解析 & 编译", sub: "Spec → 组件树 · 增量更新处理 · Step 05",
+    rows: [
+      ["解析方式", "按消息类型路由（switch createSurface / updateComponents / updateDataModel）", "<code>createSpecStreamCompiler</code> 增量编译，push(chunk) → partial spec"],
+      ["增量更新", "<span class='badge badge-good'>细粒度</span> 只发送变化的组件，客户端做 diff 合并", "全量 spec 替换，或通过 JSON Patch 增量"],
+      ["流式渲染", "渲染器内置 JSONL 流解析，逐条消息处理", "<code>compiler.push(chunk)</code> 返回 <code>{result, newPatches}</code>，setSpec 触发重渲染"],
+      ["错误处理", "JSON Schema 校验，不合法组件被丢弃，不影响其他组件", "Zod 校验，类型错误在 Registry 层拦截，渲染跳过该组件"],
+      ["状态重建", "<code>updateDataModel</code> 独立更新数据，不重建组件树", "State 更新触发 React re-render，组件树不重建"],
+    ],
+    codeA: `// A2UI: 按消息类型路由处理
+function processMessage(msg) {
+  if (msg.createSurface)    initSurface(msg.createSurface);
+  if (msg.updateComponents) mergeComponents(msg.updateComponents);
+  if (msg.updateDataModel)  patchDataModel(msg.updateDataModel);
+  if (msg.deleteSurface)    removeSurface(msg.deleteSurface);
+}`,
+    codeB: `// json-render: 流式编译
+import { createSpecStreamCompiler } from "@json-render/core";
+
+const compiler = createSpecStreamCompiler();
+
+// 每个 LLM token chunk 到来时
+const { result, newPatches } = compiler.push(chunk);
+setSpec(result); // partial spec 也能立即渲染
+
+// 流结束后拿到完整 Spec
+const finalSpec = compiler.getResult();`
+  },
+  {
+    icon: "🗄️", title: "数据绑定", sub: "State / DataModel 注入 · 响应式更新 · Step 06",
+    rows: [
+      ["数据模型位置", "<span class='badge badge-info'>服务端维护</span> DataModel 由 Agent 推送（<code>updateDataModel</code>）", "<span class='badge badge-info'>客户端维护</span> <code>StateProvider</code> + React Context"],
+      ["绑定语法", '<code>{ "path": "/user/name" }</code>', '<code>{ "$state": "/user/name" }</code> / <code>{ "$bindState": "/form/val" }</code>'],
+      ["双向绑定", "通过 <code>userAction</code> 回传 + 服务端推送新 DataModel 实现", '<code>$bindState</code> 直接双向绑定本地 state，无需服务端参与'],
+      ["模板插值", "不支持（数据与结构严格分离）", '<code>{ "$template": "Hello, ${/user/name}!" }</code>'],
+      ["条件显示", "无内置，由客户端 Renderer 自行处理", '<code>visible: [{ "$state": "/hasError" }]</code> 内置支持'],
+    ],
+    codeA: `// A2UI: 服务端推送 DataModel
+// 组件通过 path 绑定数据
+{
+  "id": "name-text",
+  "component": { "Text": { "text": { "path": "/user/name" } } }
+}
+
+// 服务端推送数据（不重发组件结构）
+{
+  "updateDataModel": {
+    "surfaceId": "main",
+    "path": "/user/name",
+    "op": "replace",
+    "value": "Alice"
+  }
+}`,
+    codeB: `// json-render: 客户端本地 State
+import { StateProvider, Renderer } from "@json-render/react";
+
+<StateProvider initialState={{ user: { name: "Alice" } }}>
+  <Renderer spec={spec} registry={registry} />
+</StateProvider>
+
+// Spec 中的绑定语法
+{
+  "type": "Text",
+  "props": { "content": { "$state": "/user/name" } }
+}
+
+// 双向绑定（表单场景）
+{ "props": { "value": { "$bindState": "/form/email" } } }`
+  },
+  {
+    icon: "🖥️", title: "渲染层", sub: "原生组件 Render · 跨框架 / 跨平台 · Step 07",
+    rows: [
+      ["框架支持", "<span class='badge badge-good'>跨平台</span> Web (Lit/React) + iOS (SwiftUI) + Android (Compose) + Flutter", "<span class='badge badge-warn'>仅 React</span> <code>@json-render/react</code>，Vue/Svelte 无官方包"],
+      ["渲染器实现", "各平台各自实现 Renderer，共享同一份 JSON 协议", "<code>&lt;Renderer spec={spec} registry={registry} /&gt;</code> React 组件"],
+      ["样式控制", "完全由客户端控制，服务端不下发任何样式", "由 Registry 中的 React 组件实现（行内样式 / CSS / Tailwind 均可）"],
+      ["组件映射", "Catalog 名称 → 平台原生组件（自动适配各端控件）", "Registry 名称 → 具体 React 组件（开发者自定义实现）"],
+      ["扩展能力", "扩展 Catalog → 各平台分别实现对应原生组件", "直接在 Registry 中添加新组件，灵活度高，学习成本低"],
+    ],
+    codeA: `// A2UI: 各平台实现 Renderer（以 Web Lit 为例）
+import { createSignalA2uiMessageProcessor } from "@a2ui/lit";
+
+const processor = createSignalA2uiMessageProcessor();
+stream.on("message", (msg) => processor.process(msg));
+
+// iOS → SwiftUI View
+// Android → Compose 组件
+// Flutter → Widget Tree
+// 同一份 JSON，各端原生渲染`,
+    codeB: `// json-render: React Renderer
+import { Renderer } from "@json-render/react";
+import { registry } from "./registry";
+
+export default function App({ spec }) {
+  return (
+    <Renderer
+      spec={spec}
+      registry={registry}
+      onAction={(action, params, element) => {
+        console.log("Action:", action, params);
+      }}
+    />
+  );
+}`
+  },
+  {
+    icon: "🖱️", title: "用户交互回传", sub: "Action / Event → 触发新一轮 AI 响应 · Step 08",
+    rows: [
+      ["回传格式", "<code>userAction</code> 消息（含 surfaceId / componentId / context）", "<code>onAction(action, params, element)</code> 回调函数"],
+      ["触发方式", "组件声明 <code>action.name</code>，客户端统一收集并发送", "<code>emit('press')</code> / <code>emit('change')</code> 在组件内部触发"],
+      ["服务端感知", "<span class='badge badge-good'>完整</span> Agent 接收 userAction 后可推送新 UI，形成完整闭环", "<span class='badge badge-info'>开放</span> 框架提供 hook，闭环逻辑由开发者自定义"],
+      ["交互闭环", "Agent → UI → 用户操作 → Agent → 新 UI，全程协议规范", "框架只负责触发回调，闭环逻辑需自行实现"],
+      ["上下文传递", "<code>context</code> 字段携带交互时的数据快照（如点击的 item ID）", "<code>params</code> 传递额外参数，<code>element</code> 提供组件类型信息"],
+    ],
+    codeA: `// A2UI: 标准化 userAction
+// 客户端发送（用户点击按钮后）
+{
+  "userAction": {
+    "name": "add_to_watchlist",
+    "surfaceId": "stock-card",
+    "sourceComponentId": "add-btn",
+    "timestamp": "2026-03-24T07:30:00Z",
+    "context": { "symbol": "AAPL", "price": 145.09 }
+  }
+}
+
+// Agent 收到后推送新 UI 消息更新界面`,
+    codeB: `// json-render: onAction 回调
+// Registry 中触发
+Button: ({ props, emit }) => (
+  <button onClick={() => emit("press", { id: props.id })}>
+    {props.label}
+  </button>
+),
+
+// Renderer 消费 action
+<Renderer
+  spec={spec}
+  registry={registry}
+  onAction={(action, params, element) => {
+    if (action === "press") {
+      fetch("/api/agent", {
+        method: "POST",
+        body: JSON.stringify(params)
+      }).then(updateSpec);
+    }
+  }}
+/>`
+  },
+];
+
+function showStep(i) {
+  // Update active states
+  document.querySelectorAll('.flow-item').forEach((el, idx) => {
+    el.classList.toggle('active', idx === i);
+  });
+  document.querySelectorAll('.flow-node-btn').forEach((el, idx) => {
+    el.classList.toggle('active', idx === i);
+  });
+
+  const s = steps[i];
+  const area = document.getElementById('detailArea');
+
+  const rowsHtml = s.rows.map(([dim, a, b]) => `
+    <tr>
+      <td>${dim}</td>
+      <td>${a}</td>
+      <td>${b}</td>
+    </tr>`).join('');
+
+  area.innerHTML = `<div class="detail-panel anim">
+    <h2>${s.icon} ${s.title}</h2>
+    <div class="detail-sub">${s.sub}</div>
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>维度</th>
+          <th>🔷 A2UI — Google</th>
+          <th>🟢 json-render</th>
+        </tr>
+      </thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    <div class="code-grid">
+      <div class="code-block">
+        <div class="code-label a">A2UI</div>
+        <pre>${esc(s.codeA)}</pre>
+      </div>
+      <div class="code-block">
+        <div class="code-label b">json-render</div>
+        <pre>${esc(s.codeB)}</pre>
+      </div>
+    </div>
+  </div>`;
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// 默认选中第一步
+showStep(0);
+</script>
+</body>
+</html>
