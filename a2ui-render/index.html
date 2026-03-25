@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A2UI Renderer — 合并请求</title>
+  <style>
+    :root {
+      --primary: #1677FF;
+      --primary-hover: #0958d9;
+      --bg: #f5f7fa;
+      --card-bg: #fff;
+      --border: #e8eaed;
+      --text-primary: #1a1a2e;
+      --text-secondary: #5f6368;
+      --text-caption: #9aa0a6;
+      --radius: 8px;
+      --shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* Surface wrapper */
+    .a2ui-surface {
+      max-width: 800px;
+      margin: 32px auto;
+      padding: 0 16px 64px;
+    }
+
+    /* Layout */
+    .a2ui-column { display: flex; flex-direction: column; gap: 12px; }
+    .a2ui-row { display: flex; flex-direction: row; gap: 8px; align-items: center; }
+    .a2ui-row.justify-spaceBetween { justify-content: space-between; }
+    .a2ui-row.justify-end { justify-content: flex-end; }
+    .a2ui-row.justify-center { justify-content: center; }
+    .a2ui-row.align-start { align-items: flex-start; }
+    .a2ui-row.align-center { align-items: center; }
+
+    /* Text */
+    .a2ui-text { color: var(--text-primary); }
+    .a2ui-text.variant-h1 { font-size: 22px; font-weight: 700; }
+    .a2ui-text.variant-h2 { font-size: 18px; font-weight: 700; }
+    .a2ui-text.variant-h3 { font-size: 16px; font-weight: 600; }
+    .a2ui-text.variant-h4 { font-size: 14px; font-weight: 600; }
+    .a2ui-text.variant-body { font-size: 14px; color: var(--text-secondary); }
+    .a2ui-text.variant-caption { font-size: 12px; color: var(--text-caption); }
+
+    /* Image */
+    .a2ui-image { border-radius: 6px; object-fit: cover; display: block; }
+    .a2ui-image.variant-avatar { width: 28px; height: 28px; border-radius: 50%; }
+    .a2ui-image.variant-smallFeature { width: 72px; height: 72px; border-radius: 6px; flex-shrink: 0; }
+    .a2ui-image.variant-header { width: 100%; height: 220px; border-radius: 10px; }
+
+    /* Icon */
+    .a2ui-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-secondary); flex-shrink: 0; }
+    .a2ui-icon svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* Divider */
+    .a2ui-divider { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+
+    /* Card */
+    .a2ui-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    /* Button */
+    .a2ui-button {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 6px; cursor: pointer;
+      font-size: 14px; font-weight: 500; border: none;
+      transition: background 0.15s, opacity 0.15s;
+      white-space: nowrap;
+    }
+    .a2ui-button:hover { opacity: 0.85; }
+    .a2ui-button.variant-primary { background: var(--primary); color: #fff; }
+    .a2ui-button.variant-default { background: #fff; color: var(--text-primary); border: 1px solid var(--border); }
+    .a2ui-button.variant-borderless { background: transparent; color: var(--primary); padding: 7px 8px; }
+
+    /* TextField */
+    .a2ui-textfield { display: flex; flex-direction: column; gap: 4px; }
+    .a2ui-textfield label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+    .a2ui-textfield input, .a2ui-textfield textarea {
+      width: 100%; padding: 8px 12px; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 14px; background: #fafbfc;
+      outline: none; transition: border 0.15s;
+    }
+    .a2ui-textfield input:focus, .a2ui-textfield textarea:focus { border-color: var(--primary); background: #fff; }
+    .a2ui-textfield textarea { resize: vertical; min-height: 80px; }
+
+    /* Tabs */
+    .a2ui-tabs { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .a2ui-tabs-header { display: flex; border-bottom: 1px solid var(--border); background: #fafbfc; }
+    .a2ui-tab-btn {
+      padding: 12px 20px; cursor: pointer; font-size: 14px; font-weight: 500;
+      color: var(--text-secondary); border: none; background: none;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .a2ui-tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .a2ui-tab-panel { display: none; padding: 16px; }
+    .a2ui-tab-panel.active { display: block; }
+
+    /* List */
+    .a2ui-list { display: flex; flex-direction: column; gap: 8px; }
+
+    /* Modal overlay */
+    .a2ui-modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 100;
+      align-items: center; justify-content: center;
+    }
+    .a2ui-modal-overlay.open { display: flex; }
+    .a2ui-modal-box {
+      background: #fff; border-radius: 12px; padding: 28px 24px 20px;
+      min-width: 340px; max-width: 480px; width: 90%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
+      background: #e6f4ff; color: var(--primary);
+    }
+    .status-badge.merged { background: #f0fff4; color: #16a34a; }
+    .status-badge.closed { background: #fff1f0; color: #cf1322; }
+
+    /* Code style for file path */
+    .file-path { font-family: "Menlo", "Monaco", monospace; font-size: 12px; }
+    .file-changes-add { color: #16a34a; font-size: 12px; }
+    .file-changes-del { color: #cf1322; font-size: 12px; }
+
+    /* Commit hash */
+    .commit-hash {
+      font-family: monospace; font-size: 11px;
+      background: #f0f2f5; padding: 1px 6px; border-radius: 4px;
+      color: var(--text-caption);
+    }
+
+    /* Review result */
+    .review-approved { color: #16a34a; font-weight: 600; }
+    .review-changes { color: #d97706; font-weight: 600; }
+
+    /* Branch pill */
+    .branch-pill {
+      display: inline-flex; align-items: center;
+      font-family: monospace; font-size: 12px;
+      background: #f0f4ff; color: #3b5bdb;
+      padding: 2px 10px; border-radius: 4px; white-space: nowrap;
+    }
+
+    /* Files summary */
+    .files-summary {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 0; font-size: 12px; color: var(--text-caption);
+    }
+
+    .weight-1 { flex: 1; }
+  </style>
+</head>
+<body>
+
+<div class="a2ui-surface" id="surface-merge-request"></div>
+
+<!-- Modal: 关闭 MR 确认 -->
+<div class="a2ui-modal-overlay" id="modal-close-mr">
+  <div class="a2ui-modal-box">
+    <div class="a2ui-column" style="gap:16px">
+      <span class="a2ui-text variant-h2">关闭合并请求</span>
+      <span class="a2ui-text variant-body">确定要关闭此合并请求吗？关闭后可以重新开启。</span>
+      <div class="a2ui-row justify-end" style="gap:8px">
+        <button class="a2ui-button variant-borderless" onclick="closeModal('modal-close-mr')">取消</button>
+        <button class="a2ui-button variant-primary" onclick="handleAction('close_mr')">确认关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 合并确认 -->
+<div class="a2ui-modal-overlay" id="modal-merge">
+  <div class="a2ui-modal-box">
+    <div class="a2ui-column" style="gap:16px">
+      <span class="a2ui-text variant-h2">确认合并</span>
+      <span class="a2ui-text variant-body">将 <span class="branch-pill">feature/user-profile-edit</span> 合并到 <span class="branch-pill">main</span>？</span>
+      <span class="a2ui-text variant-caption">此操作将执行一次合并提交，不可撤销。</span>
+      <div class="a2ui-row justify-end" style="gap:8px">
+        <button class="a2ui-button variant-borderless" onclick="closeModal('modal-merge')">取消</button>
+        <button class="a2ui-button variant-primary" onclick="handleAction('confirm_merge')" style="background:#16a34a">确认合并</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const data = {
+  mr: {
+    title: "feat: 新增用户个人资料编辑功能",
+    statusLabel: "待合并",
+    description: "本次 MR 新增了用户个人资料页的编辑入口及保存逻辑，包括头像上传、昵称修改和简介更新。已通过单元测试和 E2E 测试。\n\n关联 Issue: #482",
+    sourceBranch: "feature/user-profile-edit",
+    targetBranch: "main",
+    createdAt: "2026-03-25  09:42",
+    author: {
+      name: "liyuanmeng05",
+      avatarUrl: "https://avatars.githubusercontent.com/u/583231?v=4"
+    },
+    filesSummary: "共 6 个文件变更",
+    filesAdd: "+284",
+    filesDel: "-47",
+    changedFiles: [
+      { path: "src/pages/UserProfile/index.tsx", add: "+142", del: "-12", status: "M" },
+      { path: "src/components/AvatarUploader.tsx", add: "+98", del: "-0", status: "A" },
+      { path: "src/api/user.ts", add: "+24", del: "-8", status: "M" },
+      { path: "src/store/userSlice.ts", add: "+12", del: "-6", status: "M" },
+      { path: "tests/userProfile.spec.ts", add: "+8", del: "-21", status: "M" },
+      { path: "src/styles/profile.css", add: "+0", del: "-22", status: "D" }
+    ],
+    commits: [
+      { message: "feat: add avatar upload component", author: "liyuanmeng05", hash: "a3f9c2d" },
+      { message: "feat: connect profile edit form to API", author: "liyuanmeng05", hash: "b81e447" },
+      { message: "test: add E2E tests for profile edit", author: "liyuanmeng05", hash: "c02d85f" }
+    ],
+    reviews: [
+      { reviewer: "zhang_wei", resultLabel: "✅ 已批准", resultClass: "review-approved", time: "昨天 16:30", comment: "代码逻辑清晰，组件拆分合理，LGTM！" },
+      { reviewer: "chen_lu", resultLabel: "💬 待修改", resultClass: "review-changes", time: "今天 09:15", comment: "AvatarUploader 缺少文件类型校验，建议限制为 jpg/png，最大 2MB。" }
+    ]
+  }
+};
+
+// ---- SVG Icons ----
+const ICONS = {
+  arrowBack: `<svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>`,
+  arrowForward: `<svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/></svg>`,
+  edit: `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`,
+  add: `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>`,
+  delete: `<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`,
+  person: `<svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>`,
+  code: `<svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>`,
+  commitHistory: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="2" y1="12" x2="8" y2="12" stroke="currentColor" stroke-width="2"/><line x1="16" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2"/></svg>`,
+  comment: `<svg viewBox="0 0 24 24"><path d="M21 6.5C21 5.12 19.88 4 18.5 4h-13C4.12 4 3 5.12 3 6.5v9C3 16.88 4.12 18 5.5 18H7l3 3 3-3h5.5c1.38 0 2.5-1.12 2.5-2.5v-9z"/></svg>`,
+};
+
+function getIcon(name) {
+  return `<span class="a2ui-icon">${ICONS[name] || ICONS.code}</span>`;
+}
+
+function getStatusColor(status) {
+  if (status === "A") return "color:#16a34a;font-weight:700";
+  if (status === "D") return "color:#cf1322;font-weight:700";
+  return "color:#d97706;font-weight:700";
+}
+
+function render() {
+  const mr = data.mr;
+  const surface = document.getElementById('surface-merge-request');
+
+  surface.innerHTML = `
+    <div class="a2ui-column" style="gap:16px">
+
+      <!-- Header -->
+      <div class="a2ui-row justify-spaceBetween align-center">
+        <button class="a2ui-button variant-borderless" onclick="handleAction('go_back')" style="padding:6px;border-radius:50%">
+          ${getIcon('arrowBack')}
+        </button>
+        <span class="a2ui-text variant-h1 weight-1" style="margin:0 12px">合并请求</span>
+        <span class="status-badge">● ${mr.statusLabel}</span>
+      </div>
+
+      <!-- MR Info Card -->
+      <div class="a2ui-card">
+        <div class="a2ui-column" style="gap:12px">
+          <span class="a2ui-text variant-h2">${mr.title}</span>
+
+          <!-- Author & time -->
+          <div class="a2ui-row" style="gap:8px">
+            <img class="a2ui-image variant-avatar" src="${mr.author.avatarUrl}" alt="avatar" />
+            <span class="a2ui-text variant-body" style="font-weight:600">${mr.author.name}</span>
+            <span class="a2ui-text variant-caption">创建于 ${mr.createdAt}</span>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <div class="a2ui-text variant-h4" style="margin-bottom:6px">描述</div>
+            <div class="a2ui-text variant-body" style="white-space:pre-line">${mr.description}</div>
+          </div>
+
+          <hr class="a2ui-divider" />
+
+          <!-- Branch info -->
+          <div class="a2ui-row" style="gap:10px;flex-wrap:wrap">
+            <span class="a2ui-text variant-caption">源分支</span>
+            <span class="branch-pill">${mr.sourceBranch}</span>
+            ${getIcon('arrowForward')}
+            <span class="a2ui-text variant-caption">目标分支</span>
+            <span class="branch-pill">${mr.targetBranch}</span>
+          </div>
+        </div>
+      </div>
+
+      <hr class="a2ui-divider" />
+
+      <!-- Tabs -->
+      <div class="a2ui-tabs">
+        <div class="a2ui-tabs-header">
+          <button class="a2ui-tab-btn active" onclick="switchTab(0, this)">变更文件 <span style="color:var(--text-caption)">(${mr.changedFiles.length})</span></button>
+          <button class="a2ui-tab-btn" onclick="switchTab(1, this)">提交记录 <span style="color:var(--text-caption)">(${mr.commits.length})</span></button>
+          <button class="a2ui-tab-btn" onclick="switchTab(2, this)">评审意见 <span style="color:var(--text-caption)">(${mr.reviews.length})</span></button>
+        </div>
+
+        <!-- Tab 0: Files -->
+        <div class="a2ui-tab-panel active" data-tab="0">
+          <div class="files-summary">
+            <span>${mr.filesSummary}</span>
+            <span class="file-changes-add">${mr.filesAdd}</span>
+            <span class="file-changes-del">${mr.filesDel}</span>
+          </div>
+          <div class="a2ui-list">
+            ${mr.changedFiles.map(f => `
+              <div class="a2ui-row" style="gap:10px;padding:6px 0;border-bottom:1px solid var(--border)">
+                <span style="${getStatusColor(f.status)};width:16px;text-align:center;font-size:12px">${f.status}</span>
+                <span class="file-path weight-1">${f.path}</span>
+                <span class="file-changes-add">${f.add}</span>
+                <span class="file-changes-del">${f.del}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Tab 1: Commits -->
+        <div class="a2ui-tab-panel" data-tab="1">
+          <div class="a2ui-list">
+            ${mr.commits.map(c => `
+              <div class="a2ui-card" style="padding:12px">
+                <div class="a2ui-column" style="gap:6px">
+                  <span class="a2ui-text variant-body" style="font-weight:500">${c.message}</span>
+                  <div class="a2ui-row justify-spaceBetween">
+                    <div class="a2ui-row" style="gap:6px">
+                      <span class="a2ui-icon" style="color:var(--text-caption)">${ICONS.person}</span>
+                      <span class="a2ui-text variant-caption">${c.author}</span>
+                    </div>
+                    <span class="commit-hash">${c.hash}</span>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Tab 2: Reviews -->
+        <div class="a2ui-tab-panel" data-tab="2">
+          <div class="a2ui-list">
+            ${mr.reviews.map(r => `
+              <div class="a2ui-card" style="padding:14px">
+                <div class="a2ui-column" style="gap:8px">
+                  <div class="a2ui-row justify-spaceBetween align-center">
+                    <span class="a2ui-text variant-h4">${r.reviewer}</span>
+                    <span class="${r.resultClass}" style="font-size:12px">${r.resultLabel}</span>
+                    <span class="a2ui-text variant-caption">${r.time}</span>
+                  </div>
+                  <span class="a2ui-text variant-body">${r.comment}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Action row -->
+      <div class="a2ui-row justify-end" style="gap:10px;margin-top:4px">
+        <button class="a2ui-button variant-borderless" onclick="openModal('modal-close-mr')">关闭 MR</button>
+        <button class="a2ui-button variant-default" onclick="handleAction('request_review')">请求评审</button>
+        <button class="a2ui-button variant-primary" onclick="openModal('modal-merge')">合并</button>
+      </div>
+
+    </div>
+  `;
+}
+
+function switchTab(index, btn) {
+  document.querySelectorAll('.a2ui-tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.a2ui-tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelector(`.a2ui-tab-panel[data-tab="${index}"]`).classList.add('active');
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+// Close modal on overlay click
+document.querySelectorAll('.a2ui-modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+function handleAction(name) {
+  console.log('[A2UI Action]', name);
+  closeModal('modal-close-mr');
+  closeModal('modal-merge');
+  if (name === 'close_mr') {
+    alert('MR 已关闭（模拟）');
+  } else if (name === 'confirm_merge') {
+    document.querySelector('.status-badge').textContent = '✓ 已合并';
+    document.querySelector('.status-badge').classList.add('merged');
+    alert('合并成功！（模拟）');
+  } else if (name === 'request_review') {
+    alert('已发送评审请求（模拟）');
+  } else if (name === 'go_back') {
+    alert('返回上一页（模拟）');
+  }
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A2UI — 创建 Team 任务</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+      background: #f5f7fa;
+    }
+    #surface {
+      max-width: 760px;
+      margin: 32px auto;
+      padding: 0 16px 80px;
+    }
+  </style>
+</head>
+<body>
+<div id="surface"></div>
+
+<!-- A2UI Universal Renderer v1.0 (inlined) -->
+<script>
+(function (global) {
+  'use strict';
+  const BASE_CSS = `
+    :root { --a2ui-primary: #1677FF; --a2ui-bg: #f5f7fa; --a2ui-card-bg: #ffffff; --a2ui-border: #e8eaed; --a2ui-text-primary: #1a1a2e; --a2ui-text-secondary: #5f6368; --a2ui-text-caption: #9aa0a6; --a2ui-radius: 8px; --a2ui-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04); }
+    .a2ui-surface { padding: 16px; }
+    .a2ui-column { display: flex; flex-direction: column; gap: 10px; }
+    .a2ui-row { display: flex; flex-direction: row; gap: 8px; align-items: center; }
+    .a2ui-row.j-start { justify-content: flex-start; }
+    .a2ui-row.j-center { justify-content: center; }
+    .a2ui-row.j-end { justify-content: flex-end; }
+    .a2ui-row.j-spaceBetween { justify-content: space-between; }
+    .a2ui-row.j-spaceAround { justify-content: space-around; }
+    .a2ui-row.a-start, .a2ui-column.a-start { align-items: flex-start; }
+    .a2ui-row.a-center, .a2ui-column.a-center { align-items: center; }
+    .a2ui-row.a-end, .a2ui-column.a-end { align-items: flex-end; }
+    .a2ui-row.a-stretch, .a2ui-column.a-stretch { align-items: stretch; }
+    .a2ui-list { display: flex; gap: 8px; }
+    .a2ui-list.dir-vertical { flex-direction: column; }
+    .a2ui-list.dir-horizontal { flex-direction: row; overflow-x: auto; }
+    .a2ui-card { background: var(--a2ui-card-bg); border-radius: var(--a2ui-radius); box-shadow: var(--a2ui-shadow); padding: 16px; }
+    .a2ui-text { color: var(--a2ui-text-primary); font-size: 14px; line-height: 1.6; display: block; }
+    .a2ui-text.v-h1 { font-size: 22px; font-weight: 700; }
+    .a2ui-text.v-h2 { font-size: 18px; font-weight: 700; }
+    .a2ui-text.v-h3 { font-size: 16px; font-weight: 600; }
+    .a2ui-text.v-h4 { font-size: 14px; font-weight: 600; }
+    .a2ui-text.v-h5 { font-size: 13px; font-weight: 600; }
+    .a2ui-text.v-body { color: var(--a2ui-text-secondary); }
+    .a2ui-text.v-caption { font-size: 12px; color: var(--a2ui-text-caption); }
+    .a2ui-image { border-radius: 6px; object-fit: cover; display: block; }
+    .a2ui-image.v-icon { width: 24px; height: 24px; border-radius: 4px; }
+    .a2ui-image.v-avatar { width: 32px; height: 32px; border-radius: 50%; }
+    .a2ui-icon { width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; color: var(--a2ui-text-secondary); flex-shrink: 0; }
+    .a2ui-icon svg { width: 20px; height: 20px; fill: currentColor; }
+    .a2ui-divider { border: none; border-top: 1px solid var(--a2ui-border); margin: 4px 0; }
+    .a2ui-button { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; border: none; font-family: inherit; transition: opacity 0.15s; white-space: nowrap; }
+    .a2ui-button:hover { opacity: 0.82; }
+    .a2ui-button.v-primary { background: var(--a2ui-primary); color: #fff; }
+    .a2ui-button.v-default { background: #fff; color: var(--a2ui-text-primary); border: 1px solid var(--a2ui-border); }
+    .a2ui-button.v-borderless { background: transparent; color: var(--a2ui-primary); padding: 7px 8px; }
+    .a2ui-textfield { display: flex; flex-direction: column; gap: 4px; }
+    .a2ui-textfield label { font-size: 12px; color: var(--a2ui-text-secondary); font-weight: 500; }
+    .a2ui-textfield input, .a2ui-textfield textarea { width: 100%; padding: 8px 12px; border: 1px solid var(--a2ui-border); border-radius: 6px; font-size: 14px; font-family: inherit; background: #fafbfc; outline: none; transition: border 0.15s; }
+    .a2ui-textfield input:focus, .a2ui-textfield textarea:focus { border-color: var(--a2ui-primary); background: #fff; }
+    .a2ui-textfield textarea { resize: vertical; min-height: 80px; }
+    .a2ui-checkbox { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+    .a2ui-checkbox input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--a2ui-primary); cursor: pointer; }
+    .a2ui-choice-picker { display: flex; flex-direction: column; gap: 8px; }
+    .a2ui-choice-picker label { font-size: 12px; color: var(--a2ui-text-secondary); font-weight: 500; }
+    .a2ui-choice-options { display: flex; flex-wrap: wrap; gap: 6px; }
+    .a2ui-choice-chip { padding: 4px 14px; border-radius: 20px; border: 1px solid var(--a2ui-border); cursor: pointer; font-size: 13px; transition: all 0.15s; background: #fff; font-family: inherit; }
+    .a2ui-choice-chip.selected { background: var(--a2ui-primary); color: #fff; border-color: var(--a2ui-primary); }
+    .a2ui-slider { display: flex; flex-direction: column; gap: 6px; }
+    .a2ui-slider label { font-size: 12px; color: var(--a2ui-text-secondary); font-weight: 500; }
+    .a2ui-slider input[type=range] { width: 100%; accent-color: var(--a2ui-primary); }
+    .a2ui-datetime { display: flex; flex-direction: column; gap: 4px; }
+    .a2ui-datetime label { font-size: 12px; color: var(--a2ui-text-secondary); font-weight: 500; }
+    .a2ui-datetime input { padding: 8px 12px; border: 1px solid var(--a2ui-border); border-radius: 6px; font-size: 14px; font-family: inherit; background: #fafbfc; outline: none; width: 100%; }
+    .a2ui-tabs { background: var(--a2ui-card-bg); border-radius: var(--a2ui-radius); box-shadow: var(--a2ui-shadow); overflow: hidden; }
+    .a2ui-tabs-header { display: flex; border-bottom: 1px solid var(--a2ui-border); background: #fafbfc; }
+    .a2ui-tab-btn { padding: 11px 20px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--a2ui-text-secondary); border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; font-family: inherit; }
+    .a2ui-tab-btn.active { color: var(--a2ui-primary); border-bottom-color: var(--a2ui-primary); }
+    .a2ui-tab-panel { display: none; padding: 16px; }
+    .a2ui-tab-panel.active { display: block; }
+    .a2ui-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; }
+    .a2ui-modal-overlay.open { display: flex; }
+    .a2ui-modal-box { background: #fff; border-radius: 12px; padding: 28px 24px 20px; min-width: 320px; max-width: 500px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.16); }
+  `;
+
+  const ICONS = {
+    arrowBack: '<path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>',
+    add: '<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>',
+    check: '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>',
+    close: '<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>',
+    person: '<path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>',
+    calendarToday: '<path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/>',
+    attachFile: '<path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/>',
+    warning: '<path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>',
+    edit: '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>',
+    help: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>',
+    send: '<path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>',
+    notifications: '<path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>',
+    star: '<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>',
+    moreVert: '<path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>',
+    settings: '<path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>',
+  };
+
+  function svgIcon(name) {
+    const path = ICONS[name] || ICONS.help;
+    return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${path}</svg>`;
+  }
+
+  const _customComponents = {};
+  function registerComponent(name, fn) { _customComponents[name] = fn; }
+
+  function resolveValue(value, data) {
+    if (value === null || value === undefined) return '';
+    if (typeof value !== 'object') return value;
+    if (value.path !== undefined) return getByPath(data, value.path);
+    if (value.call) return callFunction(value.call, value.args || {}, data);
+    return String(value);
+  }
+
+  function getByPath(data, path) {
+    if (!path) return '';
+    const parts = path.startsWith('/') ? path.slice(1).split('/') : path.split('/');
+    let cur = data;
+    for (const p of parts) { if (cur == null) return ''; cur = cur[p]; }
+    return cur !== undefined ? cur : '';
+  }
+
+  function callFunction(name, args, data) {
+    const r = v => resolveValue(v, data);
+    switch (name) {
+      case 'formatNumber': return Number(r(args.value)).toLocaleString();
+      case 'formatCurrency': { const v = Number(r(args.value)); try { return v.toLocaleString('zh-CN',{style:'currency',currency:args.currency||'CNY'}); } catch { return v; } }
+      case 'formatDate': { const d = new Date(r(args.value)); return isNaN(d) ? r(args.value) : d.toLocaleDateString('zh-CN'); }
+      default: return '';
+    }
+  }
+
+  function buildComponentMap(components) {
+    const map = {}; for (const c of components) map[c.id] = c; return map;
+  }
+
+  function renderComponent(id, cmap, data, onAction, modals) {
+    const comp = cmap[id];
+    if (!comp) return document.createComment('missing:' + id);
+    if (_customComponents[comp.component]) {
+      const el = _customComponents[comp.component](comp, data, { resolveValue, renderComponent, componentMap: cmap, onAction });
+      if (el) return el;
+    }
+    switch (comp.component) {
+      case 'Column': return renderColumn(comp, cmap, data, onAction, modals);
+      case 'Row': return renderRow(comp, cmap, data, onAction, modals);
+      case 'List': return renderList(comp, cmap, data, onAction, modals);
+      case 'Card': return renderCard(comp, cmap, data, onAction, modals);
+      case 'Tabs': return renderTabs(comp, cmap, data, onAction, modals);
+      case 'Modal': { modals.push({ comp, cmap, data, onAction }); return document.createComment('modal:' + comp.id); }
+      case 'Text': return renderText(comp, data);
+      case 'Image': return renderImage(comp, data);
+      case 'Icon': return renderIcon(comp, data);
+      case 'Divider': { const hr = document.createElement('hr'); hr.className = 'a2ui-divider'; return hr; }
+      case 'Button': return renderButton(comp, cmap, data, onAction, modals);
+      case 'TextField': return renderTextField(comp, data);
+      case 'CheckBox': return renderCheckBox(comp, data);
+      case 'ChoicePicker': return renderChoicePicker(comp, data);
+      case 'Slider': return renderSlider(comp, data);
+      case 'DateTimeInput': return renderDateTimeInput(comp, data);
+      default: { const d = document.createElement('div'); d.style.cssText='padding:8px;background:#fff3cd;color:#856404;border-radius:4px;font-size:12px'; d.textContent='[Unknown: '+comp.component+']'; return d; }
+    }
+  }
+
+  function resolveChildren(children, cmap, data, onAction, modals) {
+    const frag = document.createDocumentFragment();
+    if (!children) return frag;
+    if (Array.isArray(children)) {
+      children.forEach(cid => { const el = renderComponent(cid, cmap, data, onAction, modals); if (el) frag.appendChild(el); });
+    } else if (children.componentId && children.path) {
+      const items = resolveValue({ path: children.path }, data);
+      if (Array.isArray(items)) items.forEach(item => { const el = renderComponent(children.componentId, cmap, item, onAction, modals); if (el) frag.appendChild(el); });
+    }
+    return frag;
+  }
+
+  function applyWeight(el, w) { if (w !== undefined) el.style.flex = w; }
+
+  function renderColumn(comp, cmap, data, onAction, modals) {
+    const el = document.createElement('div');
+    el.className = 'a2ui-column' + (comp.align ? ' a-' + comp.align : '');
+    applyWeight(el, comp.weight); el.appendChild(resolveChildren(comp.children, cmap, data, onAction, modals)); return el;
+  }
+  function renderRow(comp, cmap, data, onAction, modals) {
+    const el = document.createElement('div');
+    el.className = 'a2ui-row' + (comp.justify ? ' j-' + comp.justify : '') + (comp.align ? ' a-' + comp.align : '');
+    applyWeight(el, comp.weight); el.appendChild(resolveChildren(comp.children, cmap, data, onAction, modals)); return el;
+  }
+  function renderList(comp, cmap, data, onAction, modals) {
+    const el = document.createElement('div');
+    el.className = 'a2ui-list dir-' + (comp.direction || 'vertical');
+    applyWeight(el, comp.weight); el.appendChild(resolveChildren(comp.children, cmap, data, onAction, modals)); return el;
+  }
+  function renderCard(comp, cmap, data, onAction, modals) {
+    const el = document.createElement('div'); el.className = 'a2ui-card'; applyWeight(el, comp.weight);
+    if (comp.child) { const c = renderComponent(comp.child, cmap, data, onAction, modals); if (c) el.appendChild(c); }
+    return el;
+  }
+  function renderTabs(comp, cmap, data, onAction, modals) {
+    const wrapper = document.createElement('div'); wrapper.className = 'a2ui-tabs';
+    const header = document.createElement('div'); header.className = 'a2ui-tabs-header';
+    const panels = document.createElement('div');
+    (comp.tabs || []).forEach((tab, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'a2ui-tab-btn' + (i === 0 ? ' active' : '');
+      btn.textContent = resolveValue(tab.title, data);
+      btn.onclick = () => {
+        wrapper.querySelectorAll('.a2ui-tab-btn').forEach(b => b.classList.remove('active'));
+        wrapper.querySelectorAll('.a2ui-tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        wrapper.querySelector('.a2ui-tab-panel[data-idx="' + i + '"]').classList.add('active');
+      };
+      header.appendChild(btn);
+      const panel = document.createElement('div');
+      panel.className = 'a2ui-tab-panel' + (i === 0 ? ' active' : ''); panel.dataset.idx = i;
+      if (tab.child) { const c = renderComponent(tab.child, cmap, data, onAction, modals); if (c) panel.appendChild(c); }
+      panels.appendChild(panel);
+    });
+    wrapper.appendChild(header); wrapper.appendChild(panels); applyWeight(wrapper, comp.weight); return wrapper;
+  }
+  function renderText(comp, data) {
+    const el = document.createElement('span');
+    el.className = 'a2ui-text' + (comp.variant ? ' v-' + comp.variant : '');
+    const text = String(resolveValue(comp.text, data) ?? '');
+    el.innerHTML = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>');
+    applyWeight(el, comp.weight); return el;
+  }
+  function renderImage(comp, data) {
+    const el = document.createElement('img');
+    el.className = 'a2ui-image' + (comp.variant ? ' v-' + comp.variant : '');
+    el.src = String(resolveValue(comp.url, data) || ''); el.alt = comp.alt || '';
+    if (comp.fit) el.style.objectFit = comp.fit;
+    el.onerror = () => { el.style.background = '#f0f2f5'; el.style.minHeight = '40px'; };
+    applyWeight(el, comp.weight); return el;
+  }
+  function renderIcon(comp, data) {
+    const el = document.createElement('span'); el.className = 'a2ui-icon';
+    const name = String(resolveValue(comp.name, data) || '');
+    el.innerHTML = (name.startsWith('<') || name.startsWith('data:')) ? name : svgIcon(name);
+    applyWeight(el, comp.weight); return el;
+  }
+  function renderButton(comp, cmap, data, onAction, modals) {
+    const btn = document.createElement('button');
+    btn.className = 'a2ui-button v-' + (comp.variant || 'default');
+    if (comp.child) { const c = renderComponent(comp.child, cmap, data, onAction, modals); if (c) btn.appendChild(c); }
+    btn.addEventListener('click', () => {
+      if (!comp.action) return;
+      const act = comp.action;
+      if (act.event) onAction && onAction({ type: 'event', name: act.event.name, componentId: comp.id, data });
+      else if (act.call === 'openUrl' && act.args?.url) window.open(act.args.url, '_blank');
+      else if (act.call) onAction && onAction({ type: 'call', name: act.call, args: act.args, componentId: comp.id, data });
+    });
+    applyWeight(btn, comp.weight); return btn;
+  }
+  function renderTextField(comp, data) {
+    const wrap = document.createElement('div'); wrap.className = 'a2ui-textfield';
+    if (comp.label) { const lbl = document.createElement('label'); lbl.textContent = String(resolveValue(comp.label, data)); wrap.appendChild(lbl); }
+    const isLong = comp.variant === 'longText';
+    const el = document.createElement(isLong ? 'textarea' : 'input');
+    if (!isLong) el.type = comp.variant === 'obscured' ? 'password' : comp.variant === 'number' ? 'number' : 'text';
+    el.value = String(resolveValue(comp.value, data) ?? ''); el.placeholder = comp.placeholder || '';
+    wrap.appendChild(el); applyWeight(wrap, comp.weight); return wrap;
+  }
+  function renderCheckBox(comp, data) {
+    const label = document.createElement('label'); label.className = 'a2ui-checkbox';
+    const input = document.createElement('input'); input.type = 'checkbox'; input.checked = !!resolveValue(comp.value, data);
+    const span = document.createElement('span'); span.textContent = String(resolveValue(comp.label, data) ?? '');
+    label.appendChild(input); label.appendChild(span); applyWeight(label, comp.weight); return label;
+  }
+  function renderChoicePicker(comp, data) {
+    const wrap = document.createElement('div'); wrap.className = 'a2ui-choice-picker';
+    if (comp.label) { const lbl = document.createElement('label'); lbl.textContent = String(resolveValue(comp.label, data)); wrap.appendChild(lbl); }
+    const opts = document.createElement('div'); opts.className = 'a2ui-choice-options';
+    const cv = resolveValue(comp.value, data);
+    const isMulti = comp.variant === 'multipleSelection';
+    const sel = new Set(Array.isArray(cv) ? cv : [cv]);
+    (comp.choices || comp.options || []).forEach(opt => {
+      const chip = document.createElement('button');
+      chip.className = 'a2ui-choice-chip' + (sel.has(opt.value) ? ' selected' : '');
+      chip.type = 'button'; chip.textContent = String(resolveValue(opt.label, data));
+      chip.onclick = () => { if (isMulti) { chip.classList.toggle('selected'); } else { opts.querySelectorAll('.a2ui-choice-chip').forEach(c => c.classList.remove('selected')); chip.classList.add('selected'); } };
+      opts.appendChild(chip);
+    });
+    wrap.appendChild(opts); applyWeight(wrap, comp.weight); return wrap;
+  }
+  function renderSlider(comp, data) {
+    const wrap = document.createElement('div'); wrap.className = 'a2ui-slider';
+    if (comp.label) {
+      const row = document.createElement('div'); row.style.cssText = 'display:flex;justify-content:space-between';
+      const lbl = document.createElement('label'); lbl.textContent = String(resolveValue(comp.label, data));
+      const span = document.createElement('span'); span.style.cssText = 'font-size:12px;color:var(--a2ui-text-caption)';
+      const iv = Number(resolveValue(comp.value, data) || comp.min || 0); span.textContent = iv;
+      row.appendChild(lbl); row.appendChild(span); wrap.appendChild(row);
+      const input = document.createElement('input'); input.type = 'range';
+      input.min = comp.min !== undefined ? comp.min : 0; input.max = comp.max !== undefined ? comp.max : 100; input.value = iv;
+      input.oninput = () => { span.textContent = input.value; }; wrap.appendChild(input);
+    }
+    applyWeight(wrap, comp.weight); return wrap;
+  }
+  function renderDateTimeInput(comp, data) {
+    const wrap = document.createElement('div'); wrap.className = 'a2ui-datetime';
+    if (comp.label) { const lbl = document.createElement('label'); lbl.textContent = String(resolveValue(comp.label, data)); wrap.appendChild(lbl); }
+    const input = document.createElement('input');
+    input.type = (comp.enableDate && comp.enableTime) ? 'datetime-local' : comp.enableTime ? 'time' : 'date';
+    input.value = String(resolveValue(comp.value, data) ?? '');
+    if (comp.min) input.min = comp.min; if (comp.max) input.max = comp.max;
+    wrap.appendChild(input); applyWeight(wrap, comp.weight); return wrap;
+  }
+
+  function mountModals(modals, surface, onAction) {
+    modals.forEach(({ comp, cmap, data }) => {
+      const overlay = document.createElement('div');
+      overlay.className = 'a2ui-modal-overlay'; overlay.id = 'a2ui-modal-' + comp.id;
+      const box = document.createElement('div'); box.className = 'a2ui-modal-box';
+      if (comp.content) {
+        const content = renderComponent(comp.content, cmap, data, (action) => { overlay.classList.remove('open'); onAction && onAction(action); }, []);
+        if (content) box.appendChild(content);
+      }
+      overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+      overlay.appendChild(box); document.body.appendChild(overlay);
+    });
+  }
+
+  function render(messages, container, options = {}) {
+    if (!document.getElementById('a2ui-renderer-styles')) {
+      const style = document.createElement('style'); style.id = 'a2ui-renderer-styles'; style.textContent = BASE_CSS; document.head.appendChild(style);
+    }
+    let surfaceId = null, components = [], dataContents = {};
+    for (const msg of messages) {
+      if (msg.createSurface) {
+        surfaceId = msg.createSurface.surfaceId;
+        const color = (options.primaryColor) || (msg.createSurface.theme || {}).primaryColor;
+        if (color) container.style.setProperty('--a2ui-primary', color);
+      }
+      if (msg.updateComponents && (!surfaceId || msg.updateComponents.surfaceId === surfaceId)) components = msg.updateComponents.components || [];
+      if (msg.updateDataModel && (!surfaceId || msg.updateDataModel.surfaceId === surfaceId)) dataContents = msg.updateDataModel.contents || {};
+    }
+    const cmap = buildComponentMap(components);
+    const modals = [];
+    const onAction = options.onAction || ((a) => console.log('[A2UI Action]', a));
+    container.className = 'a2ui-surface'; container.innerHTML = '';
+    const rootId = (components[0] || {}).id;
+    if (rootId) {
+      const rootEl = renderComponent(rootId, cmap, dataContents, (action) => {
+        const m = modals.find(m => m.comp.trigger === action.componentId);
+        if (m) { const ov = document.getElementById('a2ui-modal-' + m.comp.id); if (ov) ov.classList.add('open'); }
+        onAction(action);
+      }, modals);
+      if (rootEl) container.appendChild(rootEl);
+    }
+    mountModals(modals, container, onAction);
+  }
+
+  global.A2UIRenderer = { render, registerComponent, resolveValue };
+})(window);
+</script>
+
+<script>
+// ── A2UI JSON: 创建 Team 任务 ──────────────────────────────────────────────────
+const messages = [
+  {
+    "createSurface": {
+      "surfaceId": "team-task-create",
+      "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json",
+      "theme": { "primaryColor": "#6366F1", "agentDisplayName": "任务助手" }
+    }
+  },
+  {
+    "updateComponents": {
+      "surfaceId": "team-task-create",
+      "components": [
+        { "id": "root", "component": "Column", "children": ["page-header", "form-card", "advanced-tabs", "action-row", "confirm-modal"] },
+
+        // ── 页面头部 ──
+        { "id": "page-header", "component": "Row", "justify": "spaceBetween", "align": "center",
+          "children": ["back-btn", "page-title", "header-icon"] },
+        { "id": "back-btn", "component": "Button", "child": "back-icon", "variant": "borderless",
+          "action": { "event": { "name": "go_back" } } },
+        { "id": "back-icon", "component": "Icon", "name": "arrowBack" },
+        { "id": "page-title", "component": "Text", "text": "创建 Team 任务", "variant": "h1", "weight": 1 },
+        { "id": "header-icon", "component": "Icon", "name": "settings" },
+
+        // ── 主表单卡片 ──
+        { "id": "form-card", "component": "Card", "child": "form-body" },
+        { "id": "form-body", "component": "Column",
+          "children": ["section-basic", "task-title", "task-desc", "divider-1",
+                       "section-assign", "assign-row", "priority-picker", "divider-2",
+                       "section-time", "time-row", "notify-check"] },
+
+        // 基本信息
+        { "id": "section-basic", "component": "Row", "align": "center", "children": ["section-basic-icon", "section-basic-label"] },
+        { "id": "section-basic-icon", "component": "Icon", "name": "edit" },
+        { "id": "section-basic-label", "component": "Text", "text": "基本信息", "variant": "h4" },
+
+        { "id": "task-title", "component": "TextField", "label": "任务标题 *",
+          "value": { "path": "/form/title" }, "variant": "shortText" },
+        { "id": "task-desc", "component": "TextField", "label": "任务描述",
+          "value": { "path": "/form/description" }, "variant": "longText" },
+
+        { "id": "divider-1", "component": "Divider" },
+
+        // 负责人 & 优先级
+        { "id": "section-assign", "component": "Row", "align": "center", "children": ["section-assign-icon", "section-assign-label"] },
+        { "id": "section-assign-icon", "component": "Icon", "name": "person" },
+        { "id": "section-assign-label", "component": "Text", "text": "分配与优先级", "variant": "h4" },
+
+        { "id": "assign-row", "component": "Row", "align": "start", "children": ["assignee-picker", "team-picker"] },
+        { "id": "assignee-picker", "component": "ChoicePicker", "label": "负责人",
+          "options": [
+            { "label": "liyuanmeng05", "value": "liyuanmeng05" },
+            { "label": "zhang_wei", "value": "zhang_wei" },
+            { "label": "chen_lu", "value": "chen_lu" },
+            { "label": "wang_fang", "value": "wang_fang" }
+          ],
+          "value": { "path": "/form/assignee" },
+          "variant": "mutuallyExclusive", "displayStyle": "chips", "weight": 1 },
+        { "id": "team-picker", "component": "ChoicePicker", "label": "所属 Team",
+          "options": [
+            { "label": "前端", "value": "frontend" },
+            { "label": "后端", "value": "backend" },
+            { "label": "设计", "value": "design" },
+            { "label": "产品", "value": "product" }
+          ],
+          "value": { "path": "/form/team" },
+          "variant": "mutuallyExclusive", "displayStyle": "chips", "weight": 1 },
+
+        { "id": "priority-picker", "component": "ChoicePicker", "label": "优先级",
+          "options": [
+            { "label": "🔴 紧急", "value": "urgent" },
+            { "label": "🟠 高", "value": "high" },
+            { "label": "🟡 中", "value": "medium" },
+            { "label": "🟢 低", "value": "low" }
+          ],
+          "value": { "path": "/form/priority" },
+          "variant": "mutuallyExclusive", "displayStyle": "chips" },
+
+        { "id": "divider-2", "component": "Divider" },
+
+        // 时间 & 通知
+        { "id": "section-time", "component": "Row", "align": "center", "children": ["section-time-icon", "section-time-label"] },
+        { "id": "section-time-icon", "component": "Icon", "name": "calendarToday" },
+        { "id": "section-time-label", "component": "Text", "text": "时间与通知", "variant": "h4" },
+
+        { "id": "time-row", "component": "Row", "align": "start", "children": ["start-date", "due-date"] },
+        { "id": "start-date", "component": "DateTimeInput", "label": "开始日期",
+          "value": { "path": "/form/startDate" }, "enableDate": true, "weight": 1 },
+        { "id": "due-date", "component": "DateTimeInput", "label": "截止日期",
+          "value": { "path": "/form/dueDate" }, "enableDate": true, "weight": 1 },
+
+        { "id": "notify-check", "component": "CheckBox",
+          "label": "截止前 24 小时发送提醒通知",
+          "value": { "path": "/form/notifyBeforeDue" } },
+
+        // ── 高级设置 Tabs ──
+        { "id": "advanced-tabs", "component": "Tabs",
+          "tabs": [
+            { "title": "关联内容", "child": "related-panel" },
+            { "title": "标签 & 标记", "child": "tags-panel" },
+            { "title": "子任务", "child": "subtask-panel" }
+          ]
+        },
+
+        // Tab 0: 关联内容
+        { "id": "related-panel", "component": "Column",
+          "children": ["related-title", "related-type-picker", "related-input"] },
+        { "id": "related-title", "component": "Text", "text": "关联 PR / Issue / 文档", "variant": "body" },
+        { "id": "related-type-picker", "component": "ChoicePicker", "label": "关联类型",
+          "options": [
+            { "label": "Pull Request", "value": "pr" },
+            { "label": "Issue", "value": "issue" },
+            { "label": "文档链接", "value": "doc" }
+          ],
+          "value": { "path": "/form/relatedType" },
+          "variant": "mutuallyExclusive", "displayStyle": "chips" },
+        { "id": "related-input", "component": "TextField", "label": "链接或 ID",
+          "value": { "path": "/form/relatedRef" }, "variant": "shortText" },
+
+        // Tab 1: 标签
+        { "id": "tags-panel", "component": "Column", "children": ["tags-picker", "milestone-field"] },
+        { "id": "tags-picker", "component": "ChoicePicker", "label": "标签（可多选）",
+          "options": [
+            { "label": "bug", "value": "bug" },
+            { "label": "feature", "value": "feature" },
+            { "label": "refactor", "value": "refactor" },
+            { "label": "docs", "value": "docs" },
+            { "label": "test", "value": "test" },
+            { "label": "chore", "value": "chore" }
+          ],
+          "value": { "path": "/form/tags" },
+          "variant": "multipleSelection", "displayStyle": "chips" },
+        { "id": "milestone-field", "component": "TextField", "label": "里程碑（可选）",
+          "value": { "path": "/form/milestone" }, "variant": "shortText" },
+
+        // Tab 2: 子任务
+        { "id": "subtask-panel", "component": "Column", "children": ["subtask-hint", "subtask-list", "add-subtask-row"] },
+        { "id": "subtask-hint", "component": "Text", "text": "将大任务拆分为可跟踪的子任务", "variant": "caption" },
+        { "id": "subtask-list", "component": "List",
+          "children": { "componentId": "subtask-item", "path": "/subtasks" } },
+        { "id": "subtask-item", "component": "Row", "align": "center", "children": ["subtask-check", "subtask-name"] },
+        { "id": "subtask-check", "component": "CheckBox", "label": "", "value": { "path": "done" } },
+        { "id": "subtask-name", "component": "Text", "text": { "path": "title" }, "variant": "body", "weight": 1 },
+        { "id": "add-subtask-row", "component": "Row", "justify": "start",
+          "children": ["add-subtask-btn", "add-subtask-label"] },
+        { "id": "add-subtask-btn", "component": "Button", "child": "add-icon-sub", "variant": "borderless",
+          "action": { "event": { "name": "add_subtask" } } },
+        { "id": "add-icon-sub", "component": "Icon", "name": "add" },
+        { "id": "add-subtask-label", "component": "Text", "text": "添加子任务", "variant": "body" },
+
+        // ── 操作按钮行 ──
+        { "id": "action-row", "component": "Row", "justify": "end",
+          "children": ["cancel-btn", "draft-btn", "submit-btn"] },
+        { "id": "cancel-btn", "component": "Button", "child": "cancel-text", "variant": "borderless",
+          "action": { "event": { "name": "cancel" } } },
+        { "id": "cancel-text", "component": "Text", "text": "取消" },
+        { "id": "draft-btn", "component": "Button", "child": "draft-text", "variant": "default",
+          "action": { "event": { "name": "save_draft" } } },
+        { "id": "draft-text", "component": "Text", "text": "保存草稿" },
+        { "id": "submit-btn", "component": "Button", "child": "submit-text", "variant": "primary",
+          "action": { "event": { "name": "open_confirm" } } },
+        { "id": "submit-text", "component": "Text", "text": "创建任务" },
+
+        // ── 确认 Modal ──
+        { "id": "confirm-modal", "component": "Modal", "trigger": "submit-btn", "content": "modal-content" },
+        { "id": "modal-content", "component": "Column",
+          "children": ["modal-title", "modal-task-name", "modal-divider", "modal-summary", "modal-btn-row"] },
+        { "id": "modal-title", "component": "Text", "text": "确认创建任务", "variant": "h2" },
+        { "id": "modal-task-name", "component": "Text", "text": { "path": "/form/title" }, "variant": "body" },
+        { "id": "modal-divider", "component": "Divider" },
+        { "id": "modal-summary", "component": "Text",
+          "text": "任务将分配给所选成员，并按优先级排入 Team 看板。", "variant": "caption" },
+        { "id": "modal-btn-row", "component": "Row", "justify": "end",
+          "children": ["modal-cancel-btn", "modal-confirm-btn"] },
+        { "id": "modal-cancel-btn", "component": "Button", "child": "modal-cancel-text", "variant": "borderless",
+          "action": { "event": { "name": "close_modal" } } },
+        { "id": "modal-cancel-text", "component": "Text", "text": "返回修改" },
+        { "id": "modal-confirm-btn", "component": "Button", "child": "modal-confirm-text", "variant": "primary",
+          "action": { "event": { "name": "confirm_create" } } },
+        { "id": "modal-confirm-text", "component": "Text", "text": "确认创建" }
+      ]
+    }
+  },
+  {
+    "updateDataModel": {
+      "surfaceId": "team-task-create",
+      "contents": {
+        "form": {
+          "title": "",
+          "description": "",
+          "assignee": [],
+          "team": [],
+          "priority": ["medium"],
+          "startDate": "",
+          "dueDate": "",
+          "notifyBeforeDue": true,
+          "relatedType": [],
+          "relatedRef": "",
+          "tags": [],
+          "milestone": ""
+        },
+        "subtasks": [
+          { "title": "需求评审", "done": false },
+          { "title": "技术方案设计", "done": false },
+          { "title": "开发实现", "done": false }
+        ]
+      }
+    }
+  }
+];
+
+A2UIRenderer.render(messages, document.getElementById('surface'), {
+  onAction: (action) => {
+    console.log('[A2UI Action]', action);
+    switch (action.name) {
+      case 'go_back': alert('返回（模拟）'); break;
+      case 'cancel': alert('已取消'); break;
+      case 'save_draft': alert('草稿已保存！'); break;
+      case 'confirm_create': {
+        const modal = document.getElementById('a2ui-modal-confirm-modal');
+        if (modal) modal.classList.remove('open');
+        alert('✅ 任务已创建！（模拟）');
+        break;
+      }
+      case 'add_subtask': alert('添加子任务（可接入弹窗输入）'); break;
+    }
+  }
+});
+</script>
+</body>
+</html>
