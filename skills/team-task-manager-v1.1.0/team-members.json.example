@@ -1,0 +1,26 @@
+[
+  {
+    "username": "wangyihan",
+    "email": "wangyihan@kuaishou.com",
+    "chineseName": "王一寒",
+    "role": "产品经理"
+  },
+  {
+    "username": "qujunyan",
+    "email": "qujunyan@kuaishou.com",
+    "chineseName": "曲俊燕",
+    "role": "UI设计师"
+  },
+  {
+    "username": "cuileizhen",
+    "email": "cuileizhen@kuaishou.com",
+    "chineseName": "崔磊振",
+    "role": "开发工程师"
+  },
+  {
+    "username": "xuekelindun",
+    "email": "xuekelindun@kuaishou.com",
+    "chineseName": "薛克林顿",
+    "role": "开发工程师"
+  }
+]
