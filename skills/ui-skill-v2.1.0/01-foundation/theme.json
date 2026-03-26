@@ -1,0 +1,406 @@
+{
+  "components": {
+    "Button": {
+      "yellow1": "#FEFFE6",
+      "yellow2": "#FFFFB5",
+      "yellow3": "#FFFB8C",
+      "yellow5": "#FFEB3B",
+      "yellow6": "#FADB14",
+      "yellow7": "#D4B106",
+      "red7": "#D4332A",
+      "red6": "#FA4E3E",
+      "red5": "#FF7A69",
+      "red3": "#FFC7BA",
+      "red2": "#FFE9E3",
+      "red1": "#FFF4F0",
+      "orange1": "#FFFBE6",
+      "orange2": "#FFEDA3",
+      "orange3": "#FFE07A",
+      "orange5": "#FFBF29",
+      "orange6": "#FFAA00",
+      "orange7": "#D98900",
+      "green1": "#F0FFF1",
+      "green2": "#DAF7DD",
+      "green3": "#A9EBB2",
+      "green5": "#54D16D",
+      "green6": "#30C453",
+      "green7": "#1E9E40",
+      "cyan1": "#ebf5ff",
+      "cyan2": "#d4ebff",
+      "cyan3": "#addcff",
+      "cyan5": "#61c5ff",
+      "cyan6": "#19b2ff",
+      "cyan7": "#159ed9",
+      "blue1": "#F0F7FF",
+      "blue2": "#D6E7FF",
+      "blue3": "#ABCDFF",
+      "blue5": "#5C8FFF",
+      "blue6": "#326BFB",
+      "blue7": "#204DD4",
+      "magenta1": "#FFEBF2",
+      "magenta2": "#FFCCE1",
+      "magenta3": "#FFA6CE",
+      "magenta5": "#F757AA",
+      "magenta6": "#EA3A9B",
+      "magenta7": "#C41B7E",
+      "algorithm": true,
+      "colorBgContainerDisabled": "rgb(240,242,245)",
+      "borderColorDisabled": "rgb(235,237,240)",
+      "defaultActiveBorderColor": "rgb(32,77,212)",
+      "defaultActiveColor": "rgb(32,77,212)",
+      "defaultBorderColor": "rgb(213,214,217)",
+      "defaultColor": "rgb(37,38,38)",
+      "defaultHoverBorderColor": "rgb(92,143,255)",
+      "defaultHoverColor": "rgb(92,143,255)",
+      "groupBorderColor": "rgb(92,143,255)",
+      "textTextColor": "rgb(37,38,38)",
+      "textTextHoverColor": "rgb(137,138,140)",
+      "textTextActiveColor": "rgb(37,38,38)",
+      "textHoverBg": "rgba(255,255,255,0)",
+      "borderRadiusLG": 4,
+      "borderRadiusSM": 4,
+      "contentFontSizeLG": 14,
+      "controlHeightLG": 36,
+      "controlHeightSM": 28,
+      "primaryShadow": "0",
+      "dangerShadow": "0",
+      "defaultShadow": "0"
+    },
+    "Alert": {
+      "borderRadiusLG": 4,
+      "lineType": ""
+    },
+    "Form": {
+      "labelColor": "rgb(37,38,38)",
+      "labelRequiredMarkColor": "rgb(250,78,62)",
+      "colorError": "rgb(250,78,62)",
+      "controlHeightLG": 36,
+      "controlHeightSM": 28
+    },
+    "Divider": {
+      "colorSplit": "rgb(240,242,245)"
+    },
+    "Anchor": {
+      "colorSplit": "rgb(240,242,245)"
+    },
+    "Breadcrumb": {
+      "lastItemColor": "rgb(37,38,38)",
+      "linkHoverColor": "rgb(37,38,38)",
+      "itemColor": "rgb(137,138,140)",
+      "linkColor": "rgb(137,138,140)",
+      "separatorColor": "rgb(137,138,140)",
+      "colorBgTextHover": "rgb(245,247,250)",
+      "borderRadiusSM": 4
+    },
+    "Dropdown": {
+      "colorSplit": "rgb(240,242,245)",
+      "controlItemBgHover": "rgb(245,247,250)",
+      "borderRadiusLG": 4,
+      "borderRadiusSM": 4,
+      "borderRadiusXS": 4
+    },
+    "Pagination": {
+      "itemActiveColorDisabled": "rgb(187,189,191)",
+      "itemActiveBgDisabled": "rgb(235,237,240)",
+      "borderRadiusLG": 4,
+      "borderRadiusSM": 4
+    },
+    "Steps": {
+      "colorSplit": "rgb(240,242,245)",
+      "controlItemBgHover": "rgb(245,247,250)",
+      "iconFontSize": 14,
+      "iconSize": 24,
+      "titleLineHeight": 24
+    },
+    "Cascader": {
+      "optionSelectedColor": "rgb(37,38,38)",
+      "colorBgContainerDisabled": "rgb(240,242,245)",
+      "colorSplit": "rgb(240,242,245)",
+      "borderRadiusSM": 4
+    },
+    "Checkbox": {
+      "colorBgContainerDisabled": "rgb(235,237,240)",
+      "borderRadiusSM": 4
+    },
+    "DatePicker": {
+      "borderRadiusLG": 4,
+      "borderRadiusSM": 4
+    },
+    "Input": {
+      "addonBg": "rgb(245,247,250)",
+      "colorBgContainerDisabled": "rgb(240,242,245)",
+      "colorSplit": "rgb(240,242,245)"
+    },
+    "Tag": {
+      "lineType": "",
+      "defaultColor": "rgb(37,38,38)",
+      "borderRadiusSM": 4
+    },
+    "InputNumber": {
+      "colorBgContainerDisabled": "rgb(240,242,245)",
+      "colorSplit": "rgb(0,0,0)",
+      "borderRadiusLG": 4,
+      "borderRadiusSM": 4
+    },
+    "Mentions": {
+      "activeBorderColor": "rgb(50,107,251)",
+      "hoverBorderColor": "rgb(133,175,255)",
+      "colorBgContainerDisabled": "rgb(240,242,245)",
+      "borderRadiusLG": 4,
+      "borderRadiusSM": 4
+    },
+    "Radio": {
+      "buttonSolidCheckedBg": "rgb(50,107,251)",
+      "buttonSolidCheckedHoverBg": "rgb(133,175,255)",
+      "buttonSolidCheckedActiveBg": "rgb(32,77,212)",
+      "colorBgContainerDisabled": "rgb(240,242,245)",
+      "borderRadiusLG": 4,
+      "borderRadiusSM": 4,
+      "controlHeightLG": 36,
+      "controlHeightSM": 28
+    },
+    "Rate": {
+      "starBg": "rgb(245,247,250)"
+    },
+    "Select": {
+      "activeBorderColor": "rgb(50,107,251)",
+      "hoverBorderColor": "rgb(133,175,255)",
+      "multipleItemBg": "rgb(240,242,245)",
+      "multipleItemColorDisabled": "rgb(187,189,191)",
+      "optionActiveBg": "rgb(245,247,250)",
+      "optionSelectedBg": "rgb(240,247,255)",
+      "optionSelectedColor": "rgb(37,38,38)",
+      "colorBgContainerDisabled": "rgb(235,237,240)",
+      "colorSplit": "rgb(240,242,245)",
+      "controlHeightLG": 36,
+      "controlHeightSM": 28,
+      "fontSizeLG": 14,
+      "fontSizeSM": 14,
+      "borderRadiusLG": 4,
+      "borderRadiusSM": 4
+    },
+    "Slider": {
+      "handleActiveColor": "rgb(50,107,251)",
+      "handleActiveOutlineColor": "rgb(171,205,255)",
+      "handleColor": "rgb(171,205,255)",
+      "trackBg": "rgb(50,107,251)",
+      "trackHoverBg": "rgb(92,143,255)",
+      "controlHeightLG": 36
+    },
+    "Transfer": {
+      "colorSplit": "rgb(240,242,245)",
+      "borderRadiusLG": 4
+    },
+    "TreeSelect": {
+      "colorBgContainerDisabled": "rgb(240,242,245)",
+      "borderRadiusSM": 4,
+      "titleHeight": 28,
+      "nodeSelectedColor": "rgb(37,38,38)",
+      "nodeSelectedBg": "rgb(240,247,255)",
+      "nodeHoverColor": "rgb(37,38,38)",
+      "nodeHoverBg": "rgb(245,247,250)",
+      "fontSizeLG": 14
+    },
+    "Upload": {
+      "actionsColor": "rgb(137,138,140)",
+      "borderRadiusSM": 4
+    },
+    "Calendar": {
+      "colorSplit": "rgb(240,242,245)"
+    },
+    "Card": {
+      "extraColor": "rgb(37,38,38)",
+      "borderRadiusLG": 8
+    },
+    "Descriptions": {
+      "contentColor": "rgb(37,38,38)",
+      "extraColor": "rgb(37,38,38)",
+      "titleColor": "rgb(37,38,38)"
+    },
+    "Image": {
+      "colorBgContainerDisabled": "rgb(240,242,245)"
+    },
+    "List": {
+      "colorSplit": "rgb(240,242,245)"
+    },
+    "Popover": {
+      "blue6": "#326BFB",
+      "borderRadiusLG": 4
+    },
+    "Segmented": {
+      "itemColor": "rgb(87,88,89)",
+      "itemHoverBg": "rgb(245,247,250)",
+      "itemHoverColor": "rgb(37,38,38)",
+      "itemSelectedColor": "rgb(37,38,38)",
+      "trackBg": "rgb(245,247,250)",
+      "trackPadding": 3,
+      "controlHeightLG": 36,
+      "controlHeightSM": 28,
+      "fontSizeLG": 14,
+      "borderRadiusLG": 4,
+      "borderRadiusSM": 4,
+      "itemActiveBg": "rgb(240,247,255)"
+    },
+    "Table": {
+      "borderColor": "rgb(235,237,240)",
+      "bodySortBg": "rgb(245,247,250)",
+      "fixedHeaderSortActiveBg": "rgb(240,242,245)",
+      "footerColor": "rgb(37,38,38)",
+      "headerColor": "rgb(37,38,38)",
+      "headerSortActiveBg": "rgb(240,242,245)",
+      "headerSortHoverBg": "rgb(240,242,245)",
+      "headerSplitColor": "rgb(240,242,245)",
+      "rowSelectedBg": "rgb(240,247,255)",
+      "rowSelectedHoverBg": "rgb(171,205,255)",
+      "colorSplit": "rgb(240,242,245)",
+      "headerBorderRadius": 4
+    },
+    "Tabs": {
+      "inkBarColor": "rgb(50,107,251)",
+      "itemActiveColor": "rgb(32,77,212)",
+      "itemColor": "rgb(37,38,38)",
+      "itemHoverColor": "rgb(92,143,255)",
+      "itemSelectedColor": "rgb(50,107,251)",
+      "horizontalItemPadding": "8px 0"
+    },
+    "Tree": {
+      "directoryNodeSelectedBg": "rgb(50,107,251)",
+      "nodeHoverColor": "rgb(37,38,38)",
+      "nodeSelectedBg": "rgb(240,247,255)",
+      "nodeSelectedColor": "rgb(37,38,38)",
+      "fontSizeLG": 14,
+      "borderRadiusSM": 4,
+      "controlItemBgActiveDisabled": "rgb(240,242,245)"
+    },
+    "Drawer": {
+      "colorBgTextActive": "rgb(240,247,255)",
+      "colorBgTextHover": "rgb(245,247,250)",
+      "borderRadiusSM": 4
+    },
+    "Message": {
+      "borderRadiusLG": 4
+    },
+    "Modal": {
+      "titleColor": "rgb(37,38,38)",
+      "colorBgTextHover": "rgb(245,247,250)",
+      "colorBgTextActive": "rgb(240,247,255)",
+      "colorSplit": "rgb(240,242,245)",
+      "borderRadiusLG": 4,
+      "borderRadiusSM": 4
+    },
+    "Notification": {
+      "borderRadiusLG": 4,
+      "borderRadiusSM": 4,
+      "colorBgTextActive": "rgb(240,247,255)",
+      "colorBgTextHover": "rgb(240,242,245)"
+    },
+    "Progress": {
+      "defaultColor": "rgb(50,107,251)",
+      "circleTextColor": "rgb(37,38,38)"
+    },
+    "Skeleton": {
+      "gradientToColor": "rgba(0,0,0,0.08)",
+      "gradientFromColor": "rgba(0,0,0,0.04)"
+    },
+    "Menu": {
+      "colorSplit": "rgb(240,242,245)",
+      "itemHoverColor": "rgb(37,38,38)",
+      "itemDisabledColor": "rgb(187,189,191)",
+      "itemSelectedBg": "rgb(240,247,255)",
+      "itemSelectedColor": "rgb(50,107,251)",
+      "subMenuItemSelectedColor": "rgb(50,107,251)",
+      "horizontalItemHoverColor": "rgb(50,107,251)",
+      "horizontalItemSelectedColor": "rgb(50,107,251)",
+      "itemActiveBg": "rgb(240,247,255)",
+      "colorFillAlter": "rgb(255,255,255)"
+    },
+    "Layout": {
+      "bodyBg": "rgb(245,247,250)",
+      "footerBg": "rgb(245,247,250)",
+      "headerColor": "rgb(37,38,38)",
+      "lightTriggerColor": "rgb(37,38,38)"
+    }
+  },
+  "token": {
+    "colorPrimary": "#326bfb",
+    "colorInfo": "#326bfb",
+    "colorPrimaryActive": "#204dd4",
+    "colorPrimaryHover": "#85afff",
+    "colorPrimaryTextHover": "#5c8fff",
+    "colorPrimaryTextActive": "#204dd4",
+    "colorPrimaryText": "#326bfb",
+    "colorPrimaryBorder": "#326bfb",
+    "colorPrimaryBorderHover": "#5c8fff",
+    "colorPrimaryBg": "#f0f7ff",
+    "colorPrimaryBgHover": "#abcdff",
+    "colorSuccess": "#30c453",
+    "colorSuccessText": "#30c453",
+    "colorSuccessActive": "#1e9e40",
+    "colorSuccessHover": "#54d16d",
+    "colorSuccessTextHover": "#54d16d",
+    "colorSuccessTextActive": "#1e9e40",
+    "colorSuccessBorder": "#30c453",
+    "colorSuccessBorderHover": "#54d16d",
+    "colorSuccessBg": "#f0fff1",
+    "colorSuccessBgHover": "#a9ebb2",
+    "colorWarning": "#ffaa00",
+    "colorWarningTextHover": "#ffbf29",
+    "colorWarningTextActive": "#d98900",
+    "colorWarningText": "#ffaa00",
+    "colorWarningHover": "#ffbf29",
+    "colorWarningActive": "#d98900",
+    "colorWarningBorder": "#ffaa00",
+    "colorWarningBorderHover": "#ffbf29",
+    "colorWarningBg": "#fffbe6",
+    "colorWarningBgHover": "#ffe07a",
+    "colorError": "#fa4e3e",
+    "colorErrorText": "#fa4e3e",
+    "colorErrorBorder": "#fa4e3e",
+    "colorErrorTextHover": "#ff7a69",
+    "colorErrorTextActive": "#d4332a",
+    "colorErrorHover": "#ffa291",
+    "colorErrorActive": "#d4332a",
+    "colorErrorBorderHover": "#ff7a69",
+    "colorErrorBg": "#fff4f0",
+    "colorErrorBgHover": "#ffc7ba",
+    "colorInfoText": "#19b2ff",
+    "colorInfoBorder": "#19b2ff",
+    "colorInfoTextHover": "#61c5ff",
+    "colorInfoTextActive": "#159ed9",
+    "colorInfoBorderHover": "#61c5ff",
+    "colorInfoBg": "#ebf5ff",
+    "colorInfoBgHover": "#addcff",
+    "colorInfoActive": "#159ed9",
+    "colorInfoHover": "#87cfff",
+    "colorLink": "#326bfb",
+    "colorLinkHover": "#5c8fff",
+    "colorLinkActive": "#204dd4",
+    "colorTextBase": "#252626",
+    "colorText": "#252626",
+    "colorTextSecondary": "#575859",
+    "colorTextTertiary": "#898a8c",
+    "colorTextQuaternary": "#bbbdbf",
+    "colorBorder": "#d5d6d9",
+    "colorBorderSecondary": "#ebedf0",
+    "colorBgLayout": "#f5f7fa",
+    "colorBgMask": "#00000033",
+    "colorBgSpotlight": "#252626",
+    "fontSizeXL": 18,
+    "fontSizeHeading4": 18,
+    "fontSizeHeading3": 20,
+    "fontSizeHeading2": 22,
+    "fontSizeHeading1": 24,
+    "marginXXS": 4,
+    "borderRadius": 4,
+    "borderRadiusLG": 8,
+    "borderRadiusSM": 2,
+    "borderRadiusXS": 0,
+    "wireframe": false,
+    "colorFill": "#d5d6d9",
+    "colorFillSecondary": "#ebedf0",
+    "colorFillTertiary": "#f0f2f5",
+    "colorFillQuaternary": "#f5f7fa",
+    "boxShadow": "0px 6px 12px -10px rgba(31, 35, 41, 0.06),\n0px 8px 24px 0px rgba(31, 35, 41, 0.04),\n0px 10px 36px 10px rgba(31, 35, 41, 0.04)",
+    "boxShadowSecondary": "0px 4px 8px -8px rgba(31, 35, 41, 0.06), \n0px 6px 12px 0px rgba(31, 35, 41, 0.04),\n0px 8px 24px 8px rgba(31, 35, 41, 0.04)"
+  }
+}
