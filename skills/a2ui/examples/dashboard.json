@@ -1,0 +1,234 @@
+[
+  {
+    "createSurface": {
+      "surfaceId": "sales-dashboard",
+      "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json",
+      "theme": {
+        "primaryColor": "#1677FF",
+        "agentDisplayName": "销售分析"
+      }
+    }
+  },
+  {
+    "updateComponents": {
+      "surfaceId": "sales-dashboard",
+      "components": [
+        {
+          "id": "root",
+          "component": "Column",
+          "children": ["dashboard-title", "stats-row", "divider1", "content-tabs"]
+        },
+        {
+          "id": "dashboard-title",
+          "component": "Text",
+          "text": "销售仪表盘",
+          "variant": "h1"
+        },
+        {
+          "id": "stats-row",
+          "component": "Row",
+          "children": ["revenue-card", "orders-card", "customers-card"],
+          "justify": "spaceBetween"
+        },
+        {
+          "id": "revenue-card",
+          "component": "Card",
+          "child": "revenue-body",
+          "weight": 1
+        },
+        {
+          "id": "revenue-body",
+          "component": "Column",
+          "children": ["revenue-label", "revenue-value", "revenue-trend"]
+        },
+        {
+          "id": "revenue-label",
+          "component": "Text",
+          "text": "总营收",
+          "variant": "caption"
+        },
+        {
+          "id": "revenue-value",
+          "component": "Text",
+          "text": { "path": "/stats/revenueFormatted" },
+          "variant": "h2"
+        },
+        {
+          "id": "revenue-trend",
+          "component": "Text",
+          "text": { "path": "/stats/revenueTrend" },
+          "variant": "caption"
+        },
+        {
+          "id": "orders-card",
+          "component": "Card",
+          "child": "orders-body",
+          "weight": 1
+        },
+        {
+          "id": "orders-body",
+          "component": "Column",
+          "children": ["orders-label", "orders-value", "orders-trend"]
+        },
+        {
+          "id": "orders-label",
+          "component": "Text",
+          "text": "订单数",
+          "variant": "caption"
+        },
+        {
+          "id": "orders-value",
+          "component": "Text",
+          "text": { "path": "/stats/ordersFormatted" },
+          "variant": "h2"
+        },
+        {
+          "id": "orders-trend",
+          "component": "Text",
+          "text": { "path": "/stats/ordersTrend" },
+          "variant": "caption"
+        },
+        {
+          "id": "customers-card",
+          "component": "Card",
+          "child": "customers-body",
+          "weight": 1
+        },
+        {
+          "id": "customers-body",
+          "component": "Column",
+          "children": ["customers-label", "customers-value", "customers-trend"]
+        },
+        {
+          "id": "customers-label",
+          "component": "Text",
+          "text": "新用户",
+          "variant": "caption"
+        },
+        {
+          "id": "customers-value",
+          "component": "Text",
+          "text": { "path": "/stats/customersFormatted" },
+          "variant": "h2"
+        },
+        {
+          "id": "customers-trend",
+          "component": "Text",
+          "text": { "path": "/stats/customersTrend" },
+          "variant": "caption"
+        },
+        {
+          "id": "divider1",
+          "component": "Divider"
+        },
+        {
+          "id": "content-tabs",
+          "component": "Tabs",
+          "tabs": [
+            { "title": "最新订单", "child": "orders-list" },
+            { "title": "热销商品", "child": "products-list" }
+          ]
+        },
+        {
+          "id": "orders-list",
+          "component": "List",
+          "children": { "componentId": "order-row", "path": "/recentOrders" }
+        },
+        {
+          "id": "order-row",
+          "component": "Row",
+          "children": ["order-id", "order-customer", "order-amount", "order-status"],
+          "justify": "spaceBetween",
+          "align": "center"
+        },
+        {
+          "id": "order-id",
+          "component": "Text",
+          "text": { "path": "orderId" },
+          "variant": "caption"
+        },
+        {
+          "id": "order-customer",
+          "component": "Text",
+          "text": { "path": "customer" },
+          "variant": "body",
+          "weight": 1
+        },
+        {
+          "id": "order-amount",
+          "component": "Text",
+          "text": { "path": "amount" },
+          "variant": "body"
+        },
+        {
+          "id": "order-status",
+          "component": "Text",
+          "text": { "path": "status" },
+          "variant": "caption"
+        },
+        {
+          "id": "products-list",
+          "component": "List",
+          "children": { "componentId": "product-row", "path": "/topProducts" }
+        },
+        {
+          "id": "product-row",
+          "component": "Row",
+          "children": ["product-img", "product-info"],
+          "align": "center"
+        },
+        {
+          "id": "product-img",
+          "component": "Image",
+          "url": { "path": "imageUrl" },
+          "variant": "icon",
+          "fit": "cover"
+        },
+        {
+          "id": "product-info",
+          "component": "Column",
+          "children": ["product-name", "product-sales"],
+          "weight": 1
+        },
+        {
+          "id": "product-name",
+          "component": "Text",
+          "text": { "path": "name" },
+          "variant": "body"
+        },
+        {
+          "id": "product-sales",
+          "component": "Text",
+          "text": { "path": "salesLabel" },
+          "variant": "caption"
+        }
+      ]
+    }
+  },
+  {
+    "updateDataModel": {
+      "surfaceId": "sales-dashboard",
+      "contents": {
+        "stats": {
+          "revenueFormatted": "¥ 1,284,500",
+          "revenueTrend": "↑ 12.3% vs 上月",
+          "ordersFormatted": "8,432",
+          "ordersTrend": "↑ 8.7% vs 上月",
+          "customersFormatted": "1,204",
+          "customersTrend": "↑ 5.1% vs 上月"
+        },
+        "recentOrders": [
+          { "orderId": "#10234", "customer": "张三", "amount": "¥ 299", "status": "已完成" },
+          { "orderId": "#10233", "customer": "李四", "amount": "¥ 1,580", "status": "待发货" },
+          { "orderId": "#10232", "customer": "王五", "amount": "¥ 99", "status": "已发货" },
+          { "orderId": "#10231", "customer": "赵六", "amount": "¥ 4,200", "status": "已完成" }
+        ],
+        "topProducts": [
+          { "name": "无线蓝牙耳机 Pro", "salesLabel": "销量 2,341 件", "imageUrl": "https://example.com/earphone.jpg" },
+          { "name": "智能手表 S3", "salesLabel": "销量 1,892 件", "imageUrl": "https://example.com/watch.jpg" },
+          { "name": "便携充电宝 20000mAh", "salesLabel": "销量 1,654 件", "imageUrl": "https://example.com/powerbank.jpg" }
+        ]
+      }
+    }
+  }
+]

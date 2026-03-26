@@ -1,0 +1,143 @@
+[
+  {
+    "createSurface": {
+      "surfaceId": "restaurant-booking",
+      "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json",
+      "theme": {
+        "primaryColor": "#FF6B35",
+        "agentDisplayName": "预订助手"
+      }
+    }
+  },
+  {
+    "updateComponents": {
+      "surfaceId": "restaurant-booking",
+      "components": [
+        {
+          "id": "root",
+          "component": "Column",
+          "children": ["page-title", "form-card", "action-row"]
+        },
+        {
+          "id": "page-title",
+          "component": "Text",
+          "text": "预订餐桌",
+          "variant": "h1"
+        },
+        {
+          "id": "form-card",
+          "component": "Card",
+          "child": "form-body"
+        },
+        {
+          "id": "form-body",
+          "component": "Column",
+          "children": [
+            "name-field",
+            "phone-field",
+            "date-field",
+            "time-field",
+            "party-size-picker",
+            "special-requests"
+          ]
+        },
+        {
+          "id": "name-field",
+          "component": "TextField",
+          "label": "姓名",
+          "value": { "path": "/booking/name" },
+          "variant": "shortText"
+        },
+        {
+          "id": "phone-field",
+          "component": "TextField",
+          "label": "联系电话",
+          "value": { "path": "/booking/phone" },
+          "variant": "shortText",
+          "validationRegexp": "^1[3-9]\\d{9}$"
+        },
+        {
+          "id": "date-field",
+          "component": "DateTimeInput",
+          "label": "预订日期",
+          "value": { "path": "/booking/date" },
+          "enableDate": true,
+          "enableTime": false
+        },
+        {
+          "id": "time-field",
+          "component": "ChoicePicker",
+          "label": "用餐时段",
+          "options": [
+            { "label": "11:30 - 13:30", "value": "lunch" },
+            { "label": "17:30 - 19:30", "value": "early-dinner" },
+            { "label": "19:30 - 21:30", "value": "late-dinner" }
+          ],
+          "value": { "path": "/booking/timeSlot" },
+          "variant": "mutuallyExclusive",
+          "displayStyle": "chips"
+        },
+        {
+          "id": "party-size-picker",
+          "component": "Slider",
+          "label": "用餐人数",
+          "value": { "path": "/booking/partySize" },
+          "min": 1,
+          "max": 20
+        },
+        {
+          "id": "special-requests",
+          "component": "TextField",
+          "label": "特殊需求（可选）",
+          "value": { "path": "/booking/specialRequests" },
+          "variant": "longText"
+        },
+        {
+          "id": "action-row",
+          "component": "Row",
+          "children": ["cancel-btn", "submit-btn"],
+          "justify": "end"
+        },
+        {
+          "id": "cancel-btn",
+          "component": "Button",
+          "child": "cancel-text",
+          "variant": "borderless",
+          "action": { "event": { "name": "cancel_booking" } }
+        },
+        {
+          "id": "cancel-text",
+          "component": "Text",
+          "text": "取消"
+        },
+        {
+          "id": "submit-btn",
+          "component": "Button",
+          "child": "submit-text",
+          "variant": "primary",
+          "action": { "event": { "name": "submit_booking" } }
+        },
+        {
+          "id": "submit-text",
+          "component": "Text",
+          "text": "确认预订"
+        }
+      ]
+    }
+  },
+  {
+    "updateDataModel": {
+      "surfaceId": "restaurant-booking",
+      "contents": {
+        "booking": {
+          "name": "",
+          "phone": "",
+          "date": "",
+          "timeSlot": [],
+          "partySize": 2,
+          "specialRequests": ""
+        }
+      }
+    }
+  }
+]
