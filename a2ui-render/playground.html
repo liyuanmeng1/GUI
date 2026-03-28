@@ -902,6 +902,68 @@ function escA(s) {
   return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+// ── themeRef 支持 ──────────────────────────────────────────────────────────
+const PG_THEME_DEFAULTS = {
+  primaryColor: '#1677FF', primaryHoverColor: '#4096FF', primaryTextColor: '#FFFFFF',
+  successColor: '#16a34a', errorColor: '#cf1322', warningColor: '#d97706',
+  textColor: '#1a1a2e', textSecondaryColor: '#5f6368', textDisabledColor: '#9aa0a6',
+  bgColor: '#f0f2f5', surfaceColor: '#ffffff', borderColor: '#e0e3e8',
+  inputBgColor: '#ffffff', inputFocusBorderColor: '#1677FF', overlayBgColor: 'rgba(0,0,0,0.45)',
+  borderRadiusSm: '4px', borderRadiusMd: '8px', borderRadiusLg: '12px', borderRadiusFull: '9999px',
+  fontFamily: '"PingFang SC","Helvetica Neue",Arial,sans-serif',
+  fontSizeBase: '14px', fontSizeSm: '12px', fontSizeLg: '16px',
+  fontSizeXl: '20px', fontSizeXxl: '24px', fontSizeDisplay: '30px',
+  fontWeightNormal: '400', fontWeightMedium: '500', fontWeightBold: '700', lineHeightBase: '1.5715',
+  spacingXs: '4px', spacingSm: '8px', spacingMd: '12px', spacingLg: '16px', spacingXl: '24px',
+  shadowSm: '0 1px 4px rgba(0,0,0,0.06)', shadowMd: '0 4px 12px rgba(0,0,0,0.1)',
+  btnPaddingH: '16px', btnPaddingV: '6px',
+  btnDefaultBg: '#ffffff', btnDefaultBorderColor: '#e0e3e8', btnDefaultTextColor: '#1a1a2e',
+  inputHeight: '36px', inputBorderColor: '#e0e3e8',
+  sliderTrackColor: '#e0e3e8', sliderFillColor: '#1677FF', sliderThumbColor: '#1677FF',
+  tabsActiveColor: '#1677FF', tabsInactiveColor: '#5f6368', tabsIndicatorColor: '#1677FF'
+};
+const PG_TOKEN_TO_CSS = {
+  primaryColor: '--a2ui-primary', primaryHoverColor: '--a2ui-primary-hover',
+  primaryTextColor: '--a2ui-primary-text', successColor: '--a2ui-success',
+  errorColor: '--a2ui-error', warningColor: '--a2ui-warning',
+  textColor: '--a2ui-text-primary', textSecondaryColor: '--a2ui-text-secondary',
+  textDisabledColor: '--a2ui-text-disabled', bgColor: '--a2ui-bg',
+  surfaceColor: '--a2ui-card-bg', borderColor: '--a2ui-border',
+  inputBgColor: '--a2ui-input-bg', inputFocusBorderColor: '--a2ui-input-focus-border',
+  overlayBgColor: '--a2ui-overlay-bg',
+  borderRadiusSm: '--a2ui-radius-sm', borderRadiusMd: '--a2ui-radius',
+  borderRadiusLg: '--a2ui-radius-lg', borderRadiusFull: '--a2ui-radius-full',
+  fontFamily: '--a2ui-font-family', fontSizeBase: '--a2ui-font-size-base',
+  fontSizeSm: '--a2ui-font-size-sm', fontSizeLg: '--a2ui-font-size-lg',
+  fontSizeXl: '--a2ui-font-size-xl', fontSizeXxl: '--a2ui-font-size-xxl',
+  fontSizeDisplay: '--a2ui-font-size-display',
+  fontWeightNormal: '--a2ui-font-weight-normal', fontWeightMedium: '--a2ui-font-weight-medium',
+  fontWeightBold: '--a2ui-font-weight-bold', lineHeightBase: '--a2ui-line-height',
+  spacingXs: '--a2ui-space-xs', spacingSm: '--a2ui-space-sm', spacingMd: '--a2ui-space-md',
+  spacingLg: '--a2ui-space-lg', spacingXl: '--a2ui-space-xl',
+  shadowSm: '--a2ui-shadow-sm', shadowMd: '--a2ui-shadow',
+  btnPaddingH: '--a2ui-btn-padding-h', btnPaddingV: '--a2ui-btn-padding-v',
+  btnDefaultBg: '--a2ui-btn-default-bg', btnDefaultBorderColor: '--a2ui-btn-default-border',
+  btnDefaultTextColor: '--a2ui-btn-default-text',
+  inputHeight: '--a2ui-input-height', inputBorderColor: '--a2ui-input-border',
+  sliderTrackColor: '--a2ui-slider-track', sliderFillColor: '--a2ui-slider-fill',
+  sliderThumbColor: '--a2ui-slider-thumb',
+  tabsActiveColor: '--a2ui-tabs-active', tabsInactiveColor: '--a2ui-tabs-inactive',
+  tabsIndicatorColor: '--a2ui-tabs-indicator'
+};
+function pgResolveThemeTokens(createSurfaceMsg) {
+  const base = (createSurfaceMsg.themeRef) ? Object.assign({}, PG_THEME_DEFAULTS) : {};
+  return Object.assign(base, createSurfaceMsg.theme || {});
+}
+function pgApplyThemeTokens(el, tokens) {
+  const target = el || document.documentElement;
+  for (const [key, val] of Object.entries(tokens)) {
+    const cssVar = PG_TOKEN_TO_CSS[key];
+    if (cssVar && val != null) target.style.setProperty(cssVar, String(val));
+  }
+}
+// ── end themeRef 支持 ──────────────────────────────────────────────────────
+
 // ═══════════════════════════════════════════
 // 解析三段式消息
 // ═══════════════════════════════════════════
@@ -975,6 +1037,13 @@ function doRender() {
   } catch(e) {
     setStatus('err', '✗ 消息解析失败: ' + e.message);
     return;
+  }
+
+  // themeRef 支持：解析 createSurface 的 themeRef + theme 并应用 CSS 变量
+  if (_surface) {
+    const tokens = pgResolveThemeTokens(_surface);
+    const preview = document.getElementById('preview');
+    pgApplyThemeTokens(preview, tokens);
   }
 
   _rawMessages = parsed;
