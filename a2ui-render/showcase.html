@@ -185,9 +185,12 @@
     }
     .section-icon {
       width: 32px; height: 32px;
+      min-height: 32px; max-height: 32px;
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
+      font-size: 16px; line-height: 1;
+      flex-shrink: 0; overflow: hidden;
+      align-self: center;
     }
     .section-icon.layout { background: #e6f4ff; }
     .section-icon.display { background: #f6ffed; }
@@ -207,7 +210,7 @@
     /* ── COMPONENT CARD ── */
     .comp-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
       gap: 20px;
     }
     .comp-card {
@@ -614,36 +617,36 @@
           </div>
           <div class="comp-card-body">
             <div class="variant-label">justify 对齐方式</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
               <div>
                 <div class="demo-label">start</div>
-                <div style="display:flex;flex-direction:row;align-items:center;gap:8px;background:#f8faff;border-radius:6px;padding:8px;justify-content:flex-start;">
-                  <div class="demo-box" style="width:60px;flex:none;padding:8px 0;">A</div>
-                  <div class="demo-box" style="width:60px;flex:none;padding:8px 0;">B</div>
-                  <div class="demo-box" style="width:60px;flex:none;padding:8px 0;">C</div>
+                <div style="display:flex;flex-direction:row;align-items:center;gap:6px;background:#f8faff;border-radius:6px;padding:7px;justify-content:flex-start;">
+                  <div class="demo-box" style="width:44px;flex:none;padding:6px 0;font-size:12px;">A</div>
+                  <div class="demo-box" style="width:44px;flex:none;padding:6px 0;font-size:12px;">B</div>
+                  <div class="demo-box" style="width:44px;flex:none;padding:6px 0;font-size:12px;">C</div>
                 </div>
               </div>
               <div>
                 <div class="demo-label">center</div>
-                <div style="display:flex;flex-direction:row;align-items:center;gap:8px;background:#f8faff;border-radius:6px;padding:8px;justify-content:center;">
-                  <div class="demo-box" style="width:60px;flex:none;padding:8px 0;">A</div>
-                  <div class="demo-box" style="width:60px;flex:none;padding:8px 0;">B</div>
-                  <div class="demo-box" style="width:60px;flex:none;padding:8px 0;">C</div>
+                <div style="display:flex;flex-direction:row;align-items:center;gap:6px;background:#f8faff;border-radius:6px;padding:7px;justify-content:center;">
+                  <div class="demo-box" style="width:44px;flex:none;padding:6px 0;font-size:12px;">A</div>
+                  <div class="demo-box" style="width:44px;flex:none;padding:6px 0;font-size:12px;">B</div>
+                  <div class="demo-box" style="width:44px;flex:none;padding:6px 0;font-size:12px;">C</div>
                 </div>
               </div>
               <div>
                 <div class="demo-label">spaceBetween</div>
-                <div style="display:flex;flex-direction:row;align-items:center;gap:8px;background:#f8faff;border-radius:6px;padding:8px;justify-content:space-between;">
-                  <div class="demo-box" style="width:60px;flex:none;padding:8px 0;">A</div>
-                  <div class="demo-box" style="width:60px;flex:none;padding:8px 0;">B</div>
-                  <div class="demo-box" style="width:60px;flex:none;padding:8px 0;">C</div>
+                <div style="display:flex;flex-direction:row;align-items:center;gap:6px;background:#f8faff;border-radius:6px;padding:7px;justify-content:space-between;">
+                  <div class="demo-box" style="width:44px;flex:none;padding:6px 0;font-size:12px;">A</div>
+                  <div class="demo-box" style="width:44px;flex:none;padding:6px 0;font-size:12px;">B</div>
+                  <div class="demo-box" style="width:44px;flex:none;padding:6px 0;font-size:12px;">C</div>
                 </div>
               </div>
               <div>
                 <div class="demo-label">weight 弹性子项</div>
-                <div style="display:flex;flex-direction:row;align-items:stretch;gap:8px;background:#f8faff;border-radius:6px;padding:8px;">
-                  <div class="demo-box" style="flex:2;padding:8px 0;">weight: 2</div>
-                  <div class="demo-box" style="flex:1;padding:8px 0;">weight: 1</div>
+                <div style="display:flex;flex-direction:row;align-items:stretch;gap:6px;background:#f8faff;border-radius:6px;padding:7px;">
+                  <div class="demo-box" style="flex:2;padding:6px 0;font-size:12px;">×2</div>
+                  <div class="demo-box" style="flex:1;padding:6px 0;font-size:12px;">×1</div>
                 </div>
               </div>
             </div>
