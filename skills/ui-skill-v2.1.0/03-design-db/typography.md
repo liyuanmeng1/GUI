@@ -89,13 +89,15 @@ font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-
 详情页中使用 `antd Descriptions` 展示只读数据时，遵循以下规范：
 
 ### 对齐方式
-- **label**：右对齐，宽度固定 `120px`，颜色 `#898A8C`，字号 `14px`
-- **content**：左对齐，颜色 `#252626`，字号 `14px`
+- **label**：左对齐，宽度固定 `120px`，颜色 `#898A8C`（三级色），字号 `14px`，**不显示冒号**
+- **content**：左对齐，颜色 `#252626`（一级色），字号 `14px`
+- **布局**：等比两列（`column={2}`）
 
 ```tsx
 <Descriptions
   column={2}
-  labelStyle={{ color: '#898A8C', width: 120, textAlign: 'right', fontSize: 14 }}
+  colon={false}
+  labelStyle={{ color: '#898A8C', width: 120, textAlign: 'left', fontSize: 14 }}
   contentStyle={{ color: '#252626', fontSize: 14 }}
 >
   <Descriptions.Item label="任务名称">cpt-task-medical-v2</Descriptions.Item>
