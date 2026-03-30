@@ -6,6 +6,7 @@
   <title>A2UI v0.9 组件全景展示</title>
   <style>
     :root {
+      /* ── page chrome (not theme-controlled) ── */
       --pri: #1677FF;
       --bg: #f0f2f5;
       --white: #ffffff;
@@ -15,6 +16,58 @@
       --text3: #9aa0a6;
       --green: #16a34a;
       --red: #cf1322;
+
+      /* ── A2UI theme tokens (overridden by theme.md parser) ── */
+      --a2ui-primary: #1677FF;
+      --a2ui-primary-hover: #4096FF;
+      --a2ui-primary-text: #FFFFFF;
+      --a2ui-success: #16a34a;
+      --a2ui-error: #cf1322;
+      --a2ui-warning: #d97706;
+      --a2ui-text: #1a1a2e;
+      --a2ui-text-secondary: #5f6368;
+      --a2ui-text-disabled: #9aa0a6;
+      --a2ui-bg: #f0f2f5;
+      --a2ui-surface: #ffffff;
+      --a2ui-border: #e0e3e8;
+      --a2ui-input-bg: #fafbfc;
+      --a2ui-input-border: #e0e3e8;
+      --a2ui-input-focus-border: #1677FF;
+      --a2ui-overlay-bg: rgba(0,0,0,0.45);
+      --a2ui-radius-sm: 4px;
+      --a2ui-radius-md: 8px;
+      --a2ui-radius-lg: 12px;
+      --a2ui-radius-full: 9999px;
+      --a2ui-font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      --a2ui-font-size-base: 14px;
+      --a2ui-font-size-sm: 12px;
+      --a2ui-font-size-lg: 16px;
+      --a2ui-font-size-xl: 20px;
+      --a2ui-font-size-xxl: 24px;
+      --a2ui-font-size-display: 30px;
+      --a2ui-font-weight-normal: 400;
+      --a2ui-font-weight-medium: 500;
+      --a2ui-font-weight-bold: 700;
+      --a2ui-line-height: 1.5715;
+      --a2ui-space-xs: 4px;
+      --a2ui-space-sm: 8px;
+      --a2ui-space-md: 12px;
+      --a2ui-space-lg: 16px;
+      --a2ui-space-xl: 24px;
+      --a2ui-shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+      --a2ui-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+      --a2ui-btn-padding-h: 16px;
+      --a2ui-btn-padding-v: 6px;
+      --a2ui-btn-default-bg: #ffffff;
+      --a2ui-btn-default-border: #e0e3e8;
+      --a2ui-btn-default-text: #1a1a2e;
+      --a2ui-input-height: 36px;
+      --a2ui-slider-track: #e0e3e8;
+      --a2ui-slider-fill: #1677FF;
+      --a2ui-slider-thumb: #1677FF;
+      --a2ui-tabs-active: #1677FF;
+      --a2ui-tabs-inactive: #5f6368;
+      --a2ui-tabs-indicator: #1677FF;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { min-height: 100%; }
@@ -50,6 +103,30 @@
     .comp-count {
       font-size: 13px; color: #5f6368;
       background: #f5f5f5; padding: 4px 12px; border-radius: 20px;
+    }
+    /* Theme upload button */
+    .theme-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 14px; border-radius: 6px; cursor: pointer;
+      font-size: 13px; font-weight: 500; border: none;
+      transition: opacity 0.15s; white-space: nowrap;
+    }
+    .theme-btn:hover { opacity: 0.82; }
+    .theme-btn-upload { background: #1677FF; color: #fff; }
+    .theme-btn-remove {
+      background: #fff; color: #cf1322;
+      border: 1px solid #ffa39e;
+    }
+    .theme-active-pill {
+      display: none; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px;
+      background: #f6ffed; border: 1px solid #b7eb8f;
+      font-size: 12px; color: #389e0d; font-weight: 500;
+    }
+    .theme-active-pill.show { display: inline-flex; }
+    .theme-file-name {
+      max-width: 120px; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap;
     }
 
     /* ── NAV SIDEBAR ── */
@@ -224,14 +301,14 @@
     .w-3 { flex: 3; }
 
     /* Text */
-    .u-text { color: #1a1a2e; line-height: 1.55; }
-    .u-text.v-h1      { font-size: 22px; font-weight: 700; }
-    .u-text.v-h2      { font-size: 18px; font-weight: 700; }
-    .u-text.v-h3      { font-size: 16px; font-weight: 600; }
-    .u-text.v-h4      { font-size: 14px; font-weight: 600; }
-    .u-text.v-h5      { font-size: 13px; font-weight: 600; }
-    .u-text.v-body    { font-size: 14px; color: #5f6368; }
-    .u-text.v-caption { font-size: 12px; color: #9aa0a6; }
+    .u-text { color: var(--a2ui-text); line-height: var(--a2ui-line-height); font-family: var(--a2ui-font-family); }
+    .u-text.v-h1      { font-size: var(--a2ui-font-size-display); font-weight: var(--a2ui-font-weight-bold); }
+    .u-text.v-h2      { font-size: var(--a2ui-font-size-xxl); font-weight: var(--a2ui-font-weight-bold); }
+    .u-text.v-h3      { font-size: var(--a2ui-font-size-xl); font-weight: var(--a2ui-font-weight-bold); }
+    .u-text.v-h4      { font-size: var(--a2ui-font-size-lg); font-weight: var(--a2ui-font-weight-medium); }
+    .u-text.v-h5      { font-size: var(--a2ui-font-size-base); font-weight: var(--a2ui-font-weight-medium); }
+    .u-text.v-body    { font-size: var(--a2ui-font-size-base); color: var(--a2ui-text-secondary); }
+    .u-text.v-caption { font-size: var(--a2ui-font-size-sm); color: var(--a2ui-text-disabled); }
 
     /* Image */
     .u-img { object-fit: cover; display: block; }
@@ -245,95 +322,97 @@
     /* Icon */
     .u-icon {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 20px; height: 20px; flex-shrink: 0; color: #5f6368;
+      width: 20px; height: 20px; flex-shrink: 0; color: var(--a2ui-text-secondary);
     }
     .u-icon svg { width: 20px; height: 20px; fill: currentColor; }
 
     /* Divider */
-    .u-divider-h { border: none; border-top: 1px solid #e0e3e8; margin: 2px 0; width: 100%; display: block; }
-    .u-divider-v { border: none; border-left: 1px solid #e0e3e8; margin: 0 2px; align-self: stretch; }
+    .u-divider-h { border: none; border-top: 1px solid var(--a2ui-border); margin: 2px 0; width: 100%; display: block; }
+    .u-divider-v { border: none; border-left: 1px solid var(--a2ui-border); margin: 0 2px; align-self: stretch; }
 
     /* Card */
     .u-card {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
-      padding: 16px;
+      background: var(--a2ui-surface);
+      border-radius: var(--a2ui-radius-md);
+      box-shadow: var(--a2ui-shadow-sm), 0 0 0 1px rgba(0,0,0,0.04);
+      padding: var(--a2ui-space-lg);
       overflow: hidden;
     }
 
     /* Button */
     .u-btn {
       display: inline-flex; align-items: center; justify-content: center;
-      gap: 5px; padding: 7px 16px; border-radius: 6px;
-      font-size: 14px; font-weight: 500; border: none; cursor: pointer;
+      gap: 5px; padding: var(--a2ui-btn-padding-v) var(--a2ui-btn-padding-h);
+      border-radius: var(--a2ui-radius-sm);
+      font-size: var(--a2ui-font-size-base); font-weight: var(--a2ui-font-weight-medium);
+      border: none; cursor: pointer;
       white-space: nowrap; transition: opacity 0.15s;
     }
     .u-btn:hover { opacity: 0.82; }
-    .u-btn.v-primary    { background: #1677FF; color: #fff; }
-    .u-btn.v-default    { background: #fff; color: #1a1a2e; border: 1px solid #e0e3e8; }
-    .u-btn.v-borderless { background: transparent; color: #1677FF; padding: 7px 6px; }
+    .u-btn.v-primary    { background: var(--a2ui-primary); color: var(--a2ui-primary-text); }
+    .u-btn.v-default    { background: var(--a2ui-btn-default-bg); color: var(--a2ui-btn-default-text); border: 1px solid var(--a2ui-btn-default-border); }
+    .u-btn.v-borderless { background: transparent; color: var(--a2ui-primary); padding: var(--a2ui-btn-padding-v) 6px; }
 
     /* TextField */
     .u-textfield { display: flex; flex-direction: column; gap: 4px; }
-    .u-textfield label { font-size: 12px; color: #5f6368; font-weight: 500; }
+    .u-textfield label { font-size: var(--a2ui-font-size-sm); color: var(--a2ui-text-secondary); font-weight: var(--a2ui-font-weight-medium); }
     .u-textfield input,
     .u-textfield textarea {
       width: 100%; padding: 8px 11px;
-      border: 1px solid #e0e3e8; border-radius: 6px;
-      font-size: 14px; font-family: inherit;
-      background: #fafbfc; outline: none;
+      border: 1px solid var(--a2ui-input-border); border-radius: var(--a2ui-radius-sm);
+      font-size: var(--a2ui-font-size-base); font-family: var(--a2ui-font-family);
+      background: var(--a2ui-input-bg); outline: none;
       transition: border-color 0.15s;
-      color: #1a1a2e;
+      color: var(--a2ui-text);
     }
     .u-textfield input:focus,
-    .u-textfield textarea:focus { border-color: #1677FF; background: #fff; }
+    .u-textfield textarea:focus { border-color: var(--a2ui-input-focus-border); background: var(--a2ui-surface); }
     .u-textfield textarea { resize: vertical; min-height: 80px; }
 
     /* CheckBox */
-    .u-checkbox { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .u-checkbox input { width: 16px; height: 16px; accent-color: #1677FF; cursor: pointer; }
-    .u-checkbox span { font-size: 14px; color: #1a1a2e; }
+    .u-checkbox { display: flex; align-items: center; gap: var(--a2ui-space-sm); cursor: pointer; }
+    .u-checkbox input { width: 16px; height: 16px; accent-color: var(--a2ui-primary); cursor: pointer; }
+    .u-checkbox span { font-size: var(--a2ui-font-size-base); color: var(--a2ui-text); }
 
     /* ChoicePicker */
     .u-choice { display: flex; flex-direction: column; gap: 6px; }
-    .u-choice-label { font-size: 12px; color: #5f6368; font-weight: 500; }
+    .u-choice-label { font-size: var(--a2ui-font-size-sm); color: var(--a2ui-text-secondary); font-weight: var(--a2ui-font-weight-medium); }
     .u-choice-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .u-chip {
-      padding: 5px 14px; border-radius: 20px;
-      border: 1px solid #e0e3e8; font-size: 13px;
-      background: #fff; color: #5f6368; cursor: pointer;
+      padding: 5px 14px; border-radius: var(--a2ui-radius-full);
+      border: 1px solid var(--a2ui-border); font-size: 13px;
+      background: var(--a2ui-surface); color: var(--a2ui-text-secondary); cursor: pointer;
       transition: all 0.15s; user-select: none;
     }
-    .u-chip.sel, .u-chip:hover { border-color: #1677FF; color: #1677FF; background: #e6f4ff; }
+    .u-chip.sel, .u-chip:hover { border-color: var(--a2ui-primary); color: var(--a2ui-primary); background: color-mix(in srgb, var(--a2ui-primary) 10%, white); }
 
     /* Slider */
     .u-slider { display: flex; flex-direction: column; gap: 5px; }
-    .u-slider label { font-size: 12px; color: #5f6368; font-weight: 500; }
-    .u-slider input[type=range] { width: 100%; accent-color: #1677FF; }
+    .u-slider label { font-size: var(--a2ui-font-size-sm); color: var(--a2ui-text-secondary); font-weight: var(--a2ui-font-weight-medium); }
+    .u-slider input[type=range] { width: 100%; accent-color: var(--a2ui-slider-thumb); }
 
     /* DateTimeInput */
     .u-datetime { display: flex; flex-direction: column; gap: 4px; }
-    .u-datetime label { font-size: 12px; color: #5f6368; font-weight: 500; }
+    .u-datetime label { font-size: var(--a2ui-font-size-sm); color: var(--a2ui-text-secondary); font-weight: var(--a2ui-font-weight-medium); }
     .u-datetime input {
-      padding: 8px 11px; border: 1px solid #e0e3e8;
-      border-radius: 6px; font-size: 14px; font-family: inherit;
-      background: #fafbfc; outline: none; color: #1a1a2e;
+      padding: 8px 11px; border: 1px solid var(--a2ui-input-border);
+      border-radius: var(--a2ui-radius-sm); font-size: var(--a2ui-font-size-base); font-family: var(--a2ui-font-family);
+      background: var(--a2ui-input-bg); outline: none; color: var(--a2ui-text);
       transition: border-color 0.15s;
     }
-    .u-datetime input:focus { border-color: #1677FF; background: #fff; }
+    .u-datetime input:focus { border-color: var(--a2ui-input-focus-border); background: var(--a2ui-surface); }
 
     /* Tabs */
-    .u-tabs { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04); }
-    .u-tabs-hd { display: flex; border-bottom: 1px solid #e0e3e8; background: #fafbfc; overflow-x: auto; }
+    .u-tabs { background: var(--a2ui-surface); border-radius: var(--a2ui-radius-md); overflow: hidden; box-shadow: var(--a2ui-shadow-sm), 0 0 0 1px rgba(0,0,0,0.04); }
+    .u-tabs-hd { display: flex; border-bottom: 1px solid var(--a2ui-border); background: var(--a2ui-input-bg); overflow-x: auto; }
     .u-tab-btn {
       padding: 11px 20px; border: none; background: none; cursor: pointer;
-      font-size: 14px; font-weight: 500; color: #5f6368;
+      font-size: var(--a2ui-font-size-base); font-weight: var(--a2ui-font-weight-medium); color: var(--a2ui-tabs-inactive);
       border-bottom: 2px solid transparent; margin-bottom: -1px;
       white-space: nowrap; transition: color 0.15s, border-color 0.15s;
     }
-    .u-tab-btn.act { color: #1677FF; border-bottom-color: #1677FF; }
-    .u-tab-panel { display: none; padding: 16px; }
+    .u-tab-btn.act { color: var(--a2ui-tabs-active); border-bottom-color: var(--a2ui-tabs-indicator); }
+    .u-tab-panel { display: none; padding: var(--a2ui-space-lg); }
     .u-tab-panel.act { display: block; }
 
     /* List */
@@ -343,15 +422,15 @@
     /* Modal */
     .u-modal-bg {
       display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.45); z-index: 300;
+      background: var(--a2ui-overlay-bg); z-index: 300;
       align-items: center; justify-content: center;
     }
     .u-modal-bg.open { display: flex; }
     .u-modal-box {
-      background: #fff; border-radius: 12px;
+      background: var(--a2ui-surface); border-radius: var(--a2ui-radius-lg);
       min-width: 320px; max-width: 480px; width: 90%;
       padding: 24px 20px 18px;
-      box-shadow: 0 10px 36px rgba(0,0,0,0.2);
+      box-shadow: var(--a2ui-shadow-md);
     }
 
     /* Video */
@@ -445,6 +524,23 @@
   <span class="site-desc">Basic Catalog 全景组件展示</span>
   <div class="header-right">
     <span class="comp-count">18 个内置组件</span>
+    <!-- 当前主题指示 -->
+    <span class="theme-active-pill" id="theme-pill">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="#389e0d"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      <span class="theme-file-name" id="theme-name"></span>
+    </span>
+    <!-- 上传 theme.md -->
+    <button class="theme-btn theme-btn-upload" onclick="document.getElementById('theme-file-input').click()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8-2V3h2v4h1.17L12 9.17 9.83 7H11zm-6 9h14v2H5z"/></svg>
+      导入 theme.md
+    </button>
+    <!-- 删除主题 -->
+    <button class="theme-btn theme-btn-remove" id="theme-remove-btn" style="display:none" onclick="removeTheme()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="#cf1322"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+      恢复默认
+    </button>
+    <!-- 隐藏的文件输入 -->
+    <input type="file" id="theme-file-input" accept=".md,text/plain" style="display:none" onchange="loadThemeFile(this)" />
   </div>
 </header>
 
@@ -1449,6 +1545,135 @@ const ICONS = {
   }, { rootMargin: '-20% 0px -70% 0px' });
   sections.forEach(s => obs.observe(s));
 })();
+
+// ══════════════════════════════════════
+// THEME.MD PARSER & CSS VAR INJECTOR
+// ══════════════════════════════════════
+
+// token名 → CSS变量名 映射表（与theme.md规范一一对应）
+const TOKEN_TO_VAR = {
+  primaryColor:          '--a2ui-primary',
+  primaryHoverColor:     '--a2ui-primary-hover',
+  primaryTextColor:      '--a2ui-primary-text',
+  successColor:          '--a2ui-success',
+  errorColor:            '--a2ui-error',
+  warningColor:          '--a2ui-warning',
+  textColor:             '--a2ui-text',
+  textSecondaryColor:    '--a2ui-text-secondary',
+  textDisabledColor:     '--a2ui-text-disabled',
+  bgColor:               '--a2ui-bg',
+  surfaceColor:          '--a2ui-surface',
+  borderColor:           '--a2ui-border',
+  inputBgColor:          '--a2ui-input-bg',
+  inputFocusBorderColor: '--a2ui-input-focus-border',
+  overlayBgColor:        '--a2ui-overlay-bg',
+  borderRadiusSm:        '--a2ui-radius-sm',
+  borderRadiusMd:        '--a2ui-radius-md',
+  borderRadiusLg:        '--a2ui-radius-lg',
+  borderRadiusFull:      '--a2ui-radius-full',
+  fontFamily:            '--a2ui-font-family',
+  fontSizeBase:          '--a2ui-font-size-base',
+  fontSizeSm:            '--a2ui-font-size-sm',
+  fontSizeLg:            '--a2ui-font-size-lg',
+  fontSizeXl:            '--a2ui-font-size-xl',
+  fontSizeXxl:           '--a2ui-font-size-xxl',
+  fontSizeDisplay:       '--a2ui-font-size-display',
+  fontWeightNormal:      '--a2ui-font-weight-normal',
+  fontWeightMedium:      '--a2ui-font-weight-medium',
+  fontWeightBold:        '--a2ui-font-weight-bold',
+  lineHeightBase:        '--a2ui-line-height',
+  spacingXs:             '--a2ui-space-xs',
+  spacingSm:             '--a2ui-space-sm',
+  spacingMd:             '--a2ui-space-md',
+  spacingLg:             '--a2ui-space-lg',
+  spacingXl:             '--a2ui-space-xl',
+  shadowSm:              '--a2ui-shadow-sm',
+  shadowMd:              '--a2ui-shadow-md',
+  btnPaddingH:           '--a2ui-btn-padding-h',
+  btnPaddingV:           '--a2ui-btn-padding-v',
+  btnDefaultBg:          '--a2ui-btn-default-bg',
+  btnDefaultBorderColor: '--a2ui-btn-default-border',
+  btnDefaultTextColor:   '--a2ui-btn-default-text',
+  inputHeight:           '--a2ui-input-height',
+  inputBorderColor:      '--a2ui-input-border',
+  sliderTrackColor:      '--a2ui-slider-track',
+  sliderFillColor:       '--a2ui-slider-fill',
+  sliderThumbColor:      '--a2ui-slider-thumb',
+  tabsActiveColor:       '--a2ui-tabs-active',
+  tabsInactiveColor:     '--a2ui-tabs-inactive',
+  tabsIndicatorColor:    '--a2ui-tabs-indicator',
+};
+
+/**
+ * 解析 theme.md 中的 token 表格行：
+ * 格式：| `tokenName` | `#value` | `--cssVar` | 说明 |
+ * 返回 { tokenName: value, ... }
+ */
+function parseThemeMd(text) {
+  const result = {};
+  // 匹配表格行：| `key` | `value` | ... |
+  const rowRe = /\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|/g;
+  let m;
+  while ((m = rowRe.exec(text)) !== null) {
+    const token = m[1].trim();
+    const value = m[2].trim();
+    if (TOKEN_TO_VAR[token]) {
+      result[token] = value;
+    }
+  }
+  return result;
+}
+
+/** 将解析出的 tokens 注入到 :root CSS 变量 */
+function applyThemeTokens(tokens) {
+  const root = document.documentElement;
+  let count = 0;
+  for (const [token, value] of Object.entries(tokens)) {
+    const cssVar = TOKEN_TO_VAR[token];
+    if (cssVar) {
+      root.style.setProperty(cssVar, value);
+      count++;
+    }
+  }
+  return count;
+}
+
+/** 重置所有 theme token 到默认值（清除 inline style） */
+function resetThemeTokens() {
+  const root = document.documentElement;
+  Object.values(TOKEN_TO_VAR).forEach(v => root.style.removeProperty(v));
+}
+
+/** 文件上传处理 */
+window.loadThemeFile = function(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const tokens = parseThemeMd(text);
+    const count = applyThemeTokens(tokens);
+    // 更新 UI 状态
+    const name = file.name;
+    document.getElementById('theme-name').textContent = name;
+    document.getElementById('theme-pill').classList.add('show');
+    document.getElementById('theme-remove-btn').style.display = 'inline-flex';
+    // 重置 file input，允许重复选同名文件
+    input.value = '';
+    if (count === 0) {
+      alert(`未从 "${name}" 中识别到任何 theme token。\n请确认文件格式符合 A2UI theme.md 规范。`);
+    }
+  };
+  reader.readAsText(file);
+};
+
+/** 恢复默认主题 */
+window.removeTheme = function() {
+  resetThemeTokens();
+  document.getElementById('theme-name').textContent = '';
+  document.getElementById('theme-pill').classList.remove('show');
+  document.getElementById('theme-remove-btn').style.display = 'none';
+};
 </script>
 </body>
 </html>
