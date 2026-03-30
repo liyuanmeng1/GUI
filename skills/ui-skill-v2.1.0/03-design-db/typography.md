@@ -81,3 +81,43 @@ font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-
 ```tsx
 <span style={{ color: '#BBBDBF' }}>–</span>
 ```
+
+---
+
+## 展示态表单排版（Descriptions）
+
+详情页中使用 `antd Descriptions` 展示只读数据时，遵循以下规范：
+
+### 对齐方式
+- **label**：右对齐，宽度固定 `120px`，颜色 `#898A8C`，字号 `14px`
+- **content**：左对齐，颜色 `#252626`，字号 `14px`
+
+```tsx
+<Descriptions
+  column={2}
+  labelStyle={{ color: '#898A8C', width: 120, textAlign: 'right', fontSize: 14 }}
+  contentStyle={{ color: '#252626', fontSize: 14 }}
+>
+  <Descriptions.Item label="任务名称">cpt-task-medical-v2</Descriptions.Item>
+  <Descriptions.Item label="任务类型">文本生成</Descriptions.Item>
+  <Descriptions.Item label="描述" span={2}>医疗领域继续预训练任务</Descriptions.Item>
+</Descriptions>
+```
+
+### 分组标题
+详情页中每个信息组之前加粗标题，样式如下：
+
+```tsx
+<div style={{ fontWeight: 500, fontSize: 14, color: '#252626', marginBottom: 12 }}>
+  基本信息
+</div>
+```
+
+### 空值规范
+Descriptions 中的空值统一显示为 `–`（en-dash），颜色 `#BBBDBF`：
+
+```tsx
+<Descriptions.Item label="描述">
+  {value || <span style={{ color: '#BBBDBF' }}>–</span>}
+</Descriptions.Item>
+```
