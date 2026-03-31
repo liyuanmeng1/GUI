@@ -237,4 +237,7 @@ A2UI 消息是一个 JSON 数组，包含一条或多条操作指令。每条指
 | 组件内联嵌套 | 在 `card.child` 中直接写组件对象 | 所有组件必须在顶层 `components` 数组中，通过 ID 引用 |
 | List template 用绝对路径 | 模板内绑定路径不需要 `/` 开头 | 模板内用相对路径如 `"name"`，非 `"/name"` |
 | Slider 缺少 `max` | Slider 的 max 是必填字段 | 始终提供 `max` 值 |
-| DateTimeInput value 未初始化 | 客户端可能报错 | 未设置时用空字符串 `""` 初始化 |
+| `DateTimeInput` value 未初始化 | 客户端可能报错 | 未设置时用空字符串 `""` 初始化 |
+| `ChoicePicker` value 未初始化 | 选中值无法写回 contents | contents 里对应字段初始化为 `[]`（数组），`TextField` 初始化为 `""` |
+| `ChoicePicker` 用 `choices` 字段 | v0.9 规范要求用 `options` | 选项数组字段名必须用 `options`，不是 `choices` |
+| 三段式顺序错误（表单场景） | updateComponents 在 updateDataModel 之前时，数据绑定路径不存在 | 表单场景下 `updateDataModel` 必须放在 `updateComponents` **之前** |

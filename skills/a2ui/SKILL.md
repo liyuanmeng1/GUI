@@ -59,7 +59,7 @@ version: 1.1.0
 | `shortText` | `TextField(variant: shortText)` | 单行文本 |
 | `longText` | `TextField(variant: longText)` | 多行文本 |
 | `number` | `TextField(variant: number)` | 数字 |
-| `SELECT` | `ChoicePicker(variant: mutuallyExclusive)` | 单选，options 映射为 choices |
+| `SELECT` | `ChoicePicker(variant: mutuallyExclusive)` | 单选，选项字段名为 `options`（非 `choices`），value 绑定为字符串数组 |
 | `MULTI_SELECT` | `ChoicePicker(variant: multipleSelection)` | 多选 |
 | `DATE` | `DateTimeInput(enableDate: true)` | 日期 |
 | `DATETIME` | `DateTimeInput(enableDate: true, enableTime: true)` | 日期时间 |
@@ -67,7 +67,7 @@ version: 1.1.0
 
 **处理规则**：
 1. `required: true` 的字段在 label 后加 `*` 标注
-2. 有 `options` 的字段生成 `ChoicePicker`，options 数组映射到 `choices`
+2. 有 `options` 的字段生成 `ChoicePicker`，选项数组字段名为 `options`（**不是** `choices`），`contents` 里对应字段初始化为 `[]`（数组）
 3. `submitAction` 绑定到提交 Button 的 action
 4. 整体布局：`Column` → 各字段 → `Row(justify: end)` → 取消/提交按钮
 
@@ -80,14 +80,42 @@ version: 1.1.0
 ```json
 [
   { "createSurface": { "surfaceId": "<描述性ID>", "catalogId": "...", "theme": {} } },
-  { "updateComponents": { "surfaceId": "<同上>", "components": [ /* 平铺列表 */ ] } },
-  { "updateDataModel": { "surfaceId": "<同上>", "contents": { /* 数据 */ } } }
+  { "updateDataModel": { "surfaceId": "<同上>", "contents": { /* 数据，必须预初始化所有字段：ChoicePicker 用 []，TextField 用 "" */ } } },
+  { "updateComponents": { "surfaceId": "<同上>", "components": [ /* 平铺列表 */ ] } }
 ]
 ```
 
 **catalogId**：
 - Basic Catalog（默认）：`https://a2ui.org/specification/v0_9/basic_catalog.json`
 - 自定义 Catalog：用户指定的 URI，同时需要在 `catalogs/` 目录下有对应描述文件
+
+**theme**：
+- **必须使用 `themeRef` 字段**引用 `theme.md` 文件，不得将 token 值直接内联写入 `theme` 字段
+- `theme` 字段仅用于**局部覆盖**：当某个界面需要覆盖个别 token 时才填写，无需覆盖则设为 `{}`
+- 渲染器运行时读取 `themeRef` 指向的文件，解析所有 token，再用 `theme` 中的键值做覆盖合并
+- 示例：
+```json
+{
+  "createSurface": {
+    "surfaceId": "my-surface",
+    "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json",
+    "themeRef": "theme.md",
+    "theme": {}
+  }
+}
+```
+- 若某个界面需要局部覆盖主色：
+```json
+{
+  "createSurface": {
+    "surfaceId": "my-surface",
+    "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json",
+    "themeRef": "theme.md",
+    "theme": { "primaryColor": "#6366F1" }
+  }
+}
+```
+- **禁止**在 `theme` 中重复列出 `theme.md` 已有的默认值，避免 `theme.md` 修改失效
 
 ### 2. 组件格式（v0.9）
 
@@ -182,6 +210,7 @@ version: 1.1.0
 
 ## 支持文件
 
+- `theme.md` — **主题 token 定义（产品方定制主题只需修改此文件）**
 - `references/basic-catalog.md` — 18 个组件完整属性速查 + 图标列表
 - `references/message-protocol.md` — 三段式消息协议完整参考
 - `references/custom-catalog.md` — 自定义 Catalog 定义与扩展指南
