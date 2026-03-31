@@ -248,14 +248,26 @@ const FormPage = ({
       </div>
 
       {/* ===== 2 + 3. 表单区域 + 按钮区域二（billing 在右侧）===== */}
-      <div className={`${styles.pageContent} ${formLayout === 'single' ? styles.pageContentSingle : styles.pageContentDouble}`}>
-        {/* 表单主体：有费用卡片时 flex:1 撑满；无费用卡片时 margin:auto 居中 */}
-        <div className={buttonVariant === 'billing' ? styles.formArea : styles.formAreaCentered}>
-          {formLayout === 'single' ? singleColumnForm : doubleColumnForm}
-        </div>
+      {/* 外层 wrapper 提供左右 24px 安全间距，内层容器按规则居中 */}
+      <div className={styles.pageContentWrapper}>
+        <div
+          className={styles.pageContent}
+          style={{
+            width: formLayout === 'single'
+              ? (buttonVariant === 'billing' ? 860 : 520)
+              : (buttonVariant === 'billing' ? 1340 : 1000),
+            maxWidth: '100%',
+            margin: '0 auto',
+          }}
+        >
+          {/* 表单主体 */}
+          <div className={styles.formArea}>
+            {formLayout === 'single' ? singleColumnForm : doubleColumnForm}
+          </div>
 
-        {/* 按钮区域二：右侧卡片（billing 时展示，单列/双列均支持） */}
-        {buttonVariant === 'billing' && billingCard}
+          {/* 按钮区域二：右侧卡片（billing 时展示） */}
+          {buttonVariant === 'billing' && billingCard}
+        </div>
       </div>
 
       {/* ===== 按钮区域一：底部居中横条（仅 normal 时展示）===== */}

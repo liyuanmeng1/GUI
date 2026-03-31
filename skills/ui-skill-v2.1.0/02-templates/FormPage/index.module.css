@@ -46,48 +46,40 @@
   white-space: nowrap;
 }
 
-/* ② 页面内容区 */
-.pageContent {
-  display: flex;
-  justify-content: center;
-  padding: 0 24px 80px;
-  gap: 40px;
+/* ② 外层 wrapper：负责滚动 + 左右 24px 安全间距 */
+.pageContentWrapper {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 24px 80px;
 }
 
-/* single 模式：表单区 520px + 右侧卡片 300px，整体居中 */
-.pageContentSingle {
-  width: 860px;
-  max-width: 860px;
-  margin: 0 auto;
+/* 内层居中容器：
+   宽度由 JSX inline style 动态控制：
+     单列无卡片  → 520px
+     单列+billing → 860px（520 + 40gap + 300）
+     双列无卡片  → 1000px
+     双列+billing → 1340px（1000 + 40gap + 300）
+   maxWidth: 100% 保证小屏不溢出
+   margin: 0 auto 水平居中 */
+.pageContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
 }
 
-/* double 模式：整体 1000px */
-.pageContentDouble {
-  width: 1000px;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-/* 表单主体区域（有费用卡片时撑满剩余空间） */
+/* 表单主体区域：flex:1 撑满容器剩余宽度 */
 .formArea {
   flex: 1;
   min-width: 0;
 }
 
-/* 无费用卡片时，表单自身居中 */
-.formAreaCentered {
-  flex: none;
-  margin: 0 auto;
-}
-
-/* ③ 单列表单 */
+/* ③ 单列表单：固定 520px */
 .formSingle {
   width: 520px;
 }
 
-/* ④ 双列表单 */
+/* ④ 双列表单：占满 formArea */
 .formDouble {
   width: 100%;
 }
@@ -118,6 +110,13 @@
   flex-direction: column;
 }
 
+/* 双列网格布局 */
+.doubleGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 24px;
+}
+
 /* 双列中左右并排的行 */
 .doubleRow {
   display: flex;
@@ -146,7 +145,6 @@
   gap: 12px;
 }
 
-/* 配置概要区域 */
 .billingSection {
   display: flex;
   flex-direction: column;
@@ -187,14 +185,12 @@
   color: #252626;
 }
 
-/* 分割线 */
 .billingDivider {
   height: 1px;
   background: #EBEDF0;
   flex-shrink: 0;
 }
 
-/* 费用预估区域 */
 .billingFeeSection {
   display: flex;
   flex-direction: column;
