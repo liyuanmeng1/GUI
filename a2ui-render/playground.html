@@ -1092,8 +1092,9 @@ function collectState() {
 
   const dm = JSON.parse(JSON.stringify(_dataModel));
 
-  // 遍历所有表单控件
+  // ── 1. 普通表单控件（input / textarea / select）──
   preview.querySelectorAll('[data-field]').forEach(el => {
+    if (el.classList.contains('u-chip')) return; // chip 单独处理
     const fid = el.getAttribute('data-field');
     const comp = _compMap[fid];
     if (!comp) return;
@@ -1101,25 +1102,72 @@ function collectState() {
     if (el.tagName === 'INPUT' && el.type === 'checkbox') newVal = el.checked;
     else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') newVal = el.value;
     else if (el.tagName === 'SELECT') newVal = el.value;
+    else return;
+    writeBack(comp, fid, newVal, dm, updated);
+  });
 
-    // 尝试找到绑定路径并回写
-    const binding = comp.value;
-    if (binding && typeof binding === 'object' && binding.path && binding.path.startsWith('/')) {
-      // 写入 dataModel
-      setPointer(dm, binding.path, newVal);
-    } else {
-      // 直接更新 comp 值
-      for (const msg of updated) {
-        if (msg.updateComponents) {
-          const c = msg.updateComponents.components.find(x => x.id === fid);
-          if (c) { c.value = newVal; }
-        }
-      }
-    }
+  // ── 2. ChoicePicker（chips 容器）──
+  // 通过 data-choice-id 找到每个 ChoicePicker 的容器，收集选中的 chip
+  preview.querySelectorAll('.u-choice-chips[id]').forEach(container => {
+    // gid = 'cp_' + comp.id，找回 comp.id
+    const gid = container.id; // e.g. 'cp_city_picker'
+    // 找对应的 comp（id 存在 chip 的 data-field 中）
+    const firstChip = container.querySelector('.u-chip[data-field]');
+    if (!firstChip) return;
+    const fid = firstChip.getAttribute('data-field');
+    const comp = _compMap[fid];
+    if (!comp) return;
+    const variant = comp.variant || 'mutuallyExclusive';
+    const selChips = Array.from(container.querySelectorAll('.u-chip.sel'));
+    const selVals = selChips.map(c => c.getAttribute('data-val'));
+    // mutuallyExclusive → 单选，但规范要求写入数组格式
+    const newVal = variant === 'multipleSelection' ? selVals : (selVals.length ? selVals : []);
+    writeBack(comp, fid, newVal, dm, updated);
+  });
+
+  // ── 3. ChoicePicker radio/checkbox 模式 ──
+  const processedChoiceGroups = new Set();
+  preview.querySelectorAll('input[type=radio][name], input[type=checkbox][name]').forEach(el => {
+    const gname = el.getAttribute('name');
+    if (processedChoiceGroups.has(gname)) return;
+    processedChoiceGroups.add(gname);
+    const isMulti = el.type === 'checkbox';
+    // 找 comp.id：radio/checkbox 的 id 格式为 gname_value，gname 格式为 cp_compid
+    const compId = gname.replace(/^cp_/, '').replace(/_/g, '-'); // 近似还原
+    // 找更准确的方式：通过 gname 找第一个 label 里的 input，再找 comp
+    const allInGroup = preview.querySelectorAll(`input[name="${gname}"]`);
+    if (!allInGroup.length) return;
+    // 找 comp：通过 container 往上找 .u-choice 再找关联 comp
+    // 简单方法：gname = 'cp_' + compId（compId 是 id 字段去除特殊字符）
+    // 遍历 _compMap 找 component=ChoicePicker 且 id 匹配
+    const compEntry = Object.values(_compMap).find(c =>
+      c.component === 'ChoicePicker' &&
+      ('cp_' + c.id.replace(/[^a-z0-9]/gi,'_')) === gname
+    );
+    if (!compEntry) return;
+    const selInputs = Array.from(allInGroup).filter(i => i.checked);
+    const selVals = selInputs.map(i => i.value);
+    const newVal = isMulti ? selVals : (selVals.length ? selVals : []);
+    writeBack(compEntry, compEntry.id, newVal, dm, updated);
   });
 
   dmMsg.contents = dm;
   return updated;
+}
+
+// ── 写回辅助函数 ──
+function writeBack(comp, fid, newVal, dm, updated) {
+  const binding = comp.value;
+  if (binding && typeof binding === 'object' && binding.path && binding.path.startsWith('/')) {
+    setPointer(dm, binding.path, newVal);
+  } else {
+    for (const msg of updated) {
+      if (msg.updateComponents) {
+        const c = msg.updateComponents.components.find(x => x.id === fid);
+        if (c) { c.value = newVal; }
+      }
+    }
+  }
 }
 
 function setPointer(obj, pointer, value) {
