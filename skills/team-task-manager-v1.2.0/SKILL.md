@@ -348,7 +348,7 @@ AI：[立即调用 API 创建，返回任务 ID]
 
 ---
 
-#### 📋 第二步：选择任务组 + 任务分类 + 填写基础信息
+#### 📋 第二步：选择任务组 + 任务分类
 
 4. **后台静默执行**（根据第一步 projectId）：
    - `GET /project/configInfo?projectId={{projectId}}&operator={{TEAM_OPERATOR}}` → 任务组 + 任务分类
@@ -359,18 +359,16 @@ AI：[立即调用 API 创建，返回任务 ID]
    |------|------|----------------|
    | 任务组 | ChoicePicker mutuallyExclusive | `[]` |
    | 任务分类 | ChoicePicker mutuallyExclusive | `[]` |
-   | 任务标题 | TextField shortText | `""` |
-   | 任务描述 | TextField longText | `""` |
 
    ```json
-   "contents": { "form": { "sectionId": [], "taskClassId": [], "title": "", "description": "" } }
+   "contents": { "form": { "sectionId": [], "taskClassId": [] } }
    ```
 
-6. **用户填写并提交**，获得 `sectionId`、`taskClassId`（均取数组第一项）、`title`、`description`
+6. **用户填写并提交**，获得 `sectionId`、`taskClassId`（均取数组第一项）
 
 ---
 
-#### 📋 第三步：填写任务动态字段
+#### 📋 第三步：填写标题、描述及任务动态字段
 
 7. **后台静默执行**（根据第二步 taskClassId）：
    - `GET /task/getFields?taskClassId={{taskClassId}}&operator={{TEAM_OPERATOR}}` → 动态字段列表
@@ -387,7 +385,15 @@ AI：[立即调用 API 创建，返回任务 ID]
    - `status` 字段：**不放入表单**，自动填充 `TEAM_DEFAULT_STATUS`
    - `required: true` 字段的 label 后加 `*`
 
-9. **生成第三步表单**，包含所有动态字段（除 status）+ 取消/提交按钮
+9. **生成第三步表单**，按以下顺序排列字段：
+   - `任务标题*`（TextField shortText，必填）
+   - `任务描述`（TextField longText，选填）
+   - 所有动态字段（除 status）
+   - 取消/提交按钮
+
+   ```json
+   "contents": { "form": { "title": "", "description": "", ...动态字段 } }
+   ```
 
 10. **用户提交**，进入创建流程
 
@@ -397,8 +403,8 @@ AI：[立即调用 API 创建，返回任务 ID]
 
 1. 合并三步表单的 `updateDataModel.contents`：
    - 第一步来源：`projectId`（取数组第一项）
-   - 第二步来源：`sectionId`（取数组第一项）、`taskClassId`（取数组第一项）、`title`、`description`
-   - 第三步来源：`assignee`、`reporter`、`priority`（取数组第一项）、`endAt`、`participant`、`label`，以及动态字段
+   - 第二步来源：`sectionId`（取数组第一项）、`taskClassId`（取数组第一项）
+   - 第三步来源：`title`、`description`、`assignee`、`reporter`、`priority`（取数组第一项）、`endAt`、`participant`、`label`，以及动态字段
 
 2. 获取 accessToken（`source .env` + POST `/token/get`）
 
