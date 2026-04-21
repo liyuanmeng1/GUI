@@ -72,6 +72,7 @@ B. 使用自己的组件库
 2. **自动写入以下文件**：
    - `01-foundation/theme.ts` — 主题 Design Token（完整的 antd v5 token 配置）
    - `01-foundation/dependencies.md` — React + Ant Design + Pro Components 依赖配置
+     - **文件头部必须包含**：`<!-- Setup Path: A -->`（标记为预置主题路径）
    - `02-templates/ProLayout.tsx` — 基于 `@ant-design/pro-layout` 的全局布局
    - `02-templates/ProTablePage.tsx` — 基于 `ProTable` 的列表页模板
    - `02-templates/ProFormPage.tsx` — 基于 `ProForm` 的表单页模板
@@ -88,7 +89,7 @@ B. 使用自己的组件库
 
 5. **Setup B 自动跳过**,直接进入 Setup C
 
-> ✅ **Setup A（路径 A）完成标志**：`01-foundation/` 和 `02-templates/` 下所有文件已写入,`SKILL.md` 开发规范已更新。
+> ✅ **Setup A（路径 A）完成标志**：`01-foundation/` 和 `02-templates/` 下所有文件已写入,`dependencies.md` 头部包含 `<!-- Setup Path: A -->`,`SKILL.md` 开发规范已更新。
 
 ---
 
@@ -107,6 +108,7 @@ B. 使用自己的组件库
 
 2. **生成并写入文件**：
    - `01-foundation/dependencies.md` — 基于用户提供信息生成的依赖配置
+     - **文件头部必须包含**：`<!-- Setup Path: B -->`（标记为自定义组件库路径）
    - `01-foundation/theme.ts`（可选）— 如果用户提供了主题配置
 
 3. **同步更新 SKILL.md 开发规范第 1 条**
@@ -118,7 +120,7 @@ B. 使用自己的组件库
 
 5. **进入 Setup B**
 
-> ✅ **Setup A（路径 B）完成标志**：`01-foundation/dependencies.md` 已写入,`SKILL.md` 开发规范已更新。
+> ✅ **Setup A（路径 B）完成标志**：`01-foundation/dependencies.md` 已写入且头部包含 `<!-- Setup Path: B -->`,`SKILL.md` 开发规范已更新。
 
 ---
 
