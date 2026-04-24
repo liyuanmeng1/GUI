@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A2UI v0.9 Playground</title>
+  <style>
+    /* ── 强制覆盖外部注入的 dark 主题 ── */
+    html, body, #app {
+      background: #f0f2f5 !important;
+      color: #1a1a2e !important;
+      color-scheme: light !important;
+    }
+    :root {
+      --pri: #1677FF;
+      --bg: #f0f2f5;
+      --white: #ffffff;
+      --border: #e0e3e8;
+      --text: #1a1a2e;
+      --text2: #5f6368;
+      --text3: #9aa0a6;
+      --green: #16a34a;
+      --red: #cf1322;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      font-size: 14px;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* ═══════════ TOOLBAR ═══════════ */
+    .toolbar {
+      height: 52px;
+      background: #fff;
+      border-bottom: 1px solid #e0e3e8;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 10px;
+      flex-shrink: 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      z-index: 10;
+    }
+    .tbar-title { font-size: 15px; font-weight: 700; color: #1a1a2e; flex: 1; }
+    .tbar-title em { color: #1677FF; font-style: normal; }
+    .tbar-badge {
+      font-size: 11px; padding: 2px 7px; border-radius: 10px;
+      background: #e6f4ff; color: #1677FF; font-weight: 600;
+    }
+
+    /* ═══════════ BUTTONS ═══════════ */
+    .btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 16px; border-radius: 6px; cursor: pointer;
+      font-size: 13px; font-weight: 500; border: none;
+      white-space: nowrap; transition: opacity 0.15s;
+      line-height: 1.4;
+    }
+    .btn:hover { opacity: 0.82; }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-pri  { background: #1677FF; color: #fff; }
+    .btn-def  { background: #fff; color: #1a1a2e; border: 1px solid #e0e3e8; }
+    .btn-ok   { background: #16a34a; color: #fff; }
+    .btn-ghost{ background: transparent; color: #1677FF; padding: 6px 8px; }
+
+    /* ═══════════ MAIN LAYOUT ═══════════ */
+    .main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 420px 4px 1fr;
+      overflow: hidden;
+    }
+
+    /* ═══════════ LEFT PANEL ═══════════ */
+    .left-panel {
+      background: #fff;
+      border-right: 1px solid #e0e3e8;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .panel-hd {
+      padding: 10px 14px;
+      border-bottom: 1px solid #e0e3e8;
+      background: #fafbfc;
+      display: flex; align-items: center; gap: 7px;
+      font-size: 12px; font-weight: 600; color: #5f6368;
+      flex-shrink: 0;
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; }
+    .dot-b { background: #1677FF; }
+    .dot-g { background: #16a34a; }
+
+    .editor-wrap { flex: 1; overflow: hidden; position: relative; }
+    #json-input {
+      width: 100%; height: 100%;
+      border: none; outline: none; resize: none;
+      font-family: "Menlo","Monaco","Consolas","Courier New",monospace;
+      font-size: 12px; line-height: 1.65;
+      padding: 14px;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      tab-size: 2;
+    }
+    #json-input::placeholder { color: #585b70; }
+
+    .editor-ft {
+      padding: 7px 14px;
+      border-top: 1px solid #e0e3e8;
+      background: #fafbfc;
+      display: flex; align-items: center; gap: 8px;
+      flex-shrink: 0;
+    }
+    .ed-status { flex: 1; font-size: 12px; }
+    .s-idle { color: #9aa0a6; }
+    .s-ok   { color: #16a34a; }
+    .s-err  { color: #cf1322; }
+
+    /* ═══════════ RESIZE ═══════════ */
+    .resizer {
+      background: transparent; cursor: col-resize;
+      transition: background 0.15s;
+    }
+    .resizer:hover, .resizer.drag { background: #1677FF; }
+
+    /* ═══════════ RIGHT PANEL ═══════════ */
+    .right-panel {
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: #f0f2f5;
+    }
+    .preview-hd {
+      padding: 9px 16px;
+      border-bottom: 1px solid #e0e3e8;
+      background: #fff;
+      display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0;
+    }
+    .preview-hd-title {
+      flex: 1; font-size: 12px; font-weight: 600; color: #5f6368;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .changed-pill {
+      display: none; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 4px;
+      background: #fffbe6; color: #d97706;
+      font-size: 11px; font-weight: 600;
+    }
+    .changed-pill.show { display: inline-flex; }
+
+    .preview-scroll {
+      flex: 1; overflow-y: auto;
+      padding: 24px;
+    }
+    .preview-inner {
+      max-width: 740px;
+      margin: 0 auto;
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: 100%; gap: 12px;
+      color: #9aa0a6;
+    }
+    .empty-icon { font-size: 44px; opacity: 0.35; }
+
+    /* Render error */
+    .render-err {
+      background: #fff1f0; border: 1px solid #ffa39e;
+      border-radius: 8px; padding: 16px;
+      color: #cf1322; font-size: 13px; line-height: 1.7;
+    }
+    .render-err code {
+      display: block; margin-top: 8px;
+      background: #fff5f5; padding: 8px 10px;
+      border-radius: 4px; font-size: 11.5px;
+      word-break: break-all; white-space: pre-wrap;
+    }
+
+    /* sample picker */
+    .sample-sel {
+      padding: 5px 10px; border: 1px solid #e0e3e8;
+      border-radius: 6px; font-size: 12px; background: #fff;
+      color: #1a1a2e; outline: none; cursor: pointer;
+    }
+
+    /* ═══════════ OUTPUT MODAL ═══════════ */
+    .modal-bg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    .modal-bg.open { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 12px;
+      width: 680px; max-width: 95vw; max-height: 85vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.22); overflow: hidden;
+    }
+    .modal-hd {
+      padding: 16px 20px 12px; border-bottom: 1px solid #e0e3e8;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .modal-hd h3 { flex: 1; font-size: 15px; font-weight: 700; }
+    .modal-body { flex: 1; overflow-y: auto; padding: 14px 20px; }
+    .modal-ft {
+      padding: 12px 20px; border-top: 1px solid #e0e3e8;
+      display: flex; justify-content: flex-end; gap: 8px;
+    }
+    #out-code {
+      width: 100%; height: 320px;
+      border: 1px solid #e0e3e8; border-radius: 8px;
+      font-family: "Menlo","Monaco","Consolas",monospace;
+      font-size: 11.5px; line-height: 1.65; padding: 12px;
+      background: #1e1e2e; color: #cdd6f4;
+      resize: none; outline: none;
+    }
+    .copy-tip { font-size: 12px; color: #9aa0a6; margin-top: 7px; }
+    .copy-tip.ok { color: #16a34a; }
+
+    /* ═══════════ A2UI COMPONENT STYLES ═══════════ */
+
+    /* Layout */
+    .u-row {
+      display: flex; flex-direction: row;
+      align-items: stretch; gap: 8px;
+    }
+    .u-col {
+      display: flex; flex-direction: column;
+      align-items: stretch; gap: 8px;
+    }
+    .u-row.j-start   { justify-content: flex-start; }
+    .u-row.j-center  { justify-content: center; }
+    .u-row.j-end     { justify-content: flex-end; }
+    .u-row.j-between { justify-content: space-between; }
+    .u-row.j-around  { justify-content: space-around; }
+    .u-row.j-evenly  { justify-content: space-evenly; }
+    .u-row.j-stretch { justify-content: stretch; }
+    .u-col.j-start   { justify-content: flex-start; }
+    .u-col.j-center  { justify-content: center; }
+    .u-col.j-end     { justify-content: flex-end; }
+    .u-col.j-between { justify-content: space-between; }
+
+    .u-row.a-start   { align-items: flex-start; }
+    .u-row.a-center  { align-items: center; }
+    .u-row.a-end     { align-items: flex-end; }
+    .u-col.a-start   { align-items: flex-start; }
+    .u-col.a-center  { align-items: center; }
+    .u-col.a-end     { align-items: flex-end; }
+
+    /* weight / flex-grow */
+    .w-1 { flex: 1; }
+    .w-2 { flex: 2; }
+    .w-3 { flex: 3; }
+
+    /* Text */
+    .u-text { color: #1a1a2e; line-height: 1.55; }
+    .u-text.v-h1      { font-size: 22px; font-weight: 700; }
+    .u-text.v-h2      { font-size: 18px; font-weight: 700; }
+    .u-text.v-h3      { font-size: 16px; font-weight: 600; }
+    .u-text.v-h4      { font-size: 14px; font-weight: 600; }
+    .u-text.v-h5      { font-size: 13px; font-weight: 600; }
+    .u-text.v-body    { font-size: 14px; color: #5f6368; }
+    .u-text.v-caption { font-size: 12px; color: #9aa0a6; }
+
+    /* Image */
+    .u-img { object-fit: cover; display: block; }
+    .u-img.v-icon         { width: 24px;  height: 24px;  border-radius: 4px; }
+    .u-img.v-avatar       { width: 36px;  height: 36px;  border-radius: 50%; }
+    .u-img.v-smallFeature { width: 72px;  height: 72px;  border-radius: 8px; flex-shrink:0; }
+    .u-img.v-mediumFeature{ width: 120px; height: 120px; border-radius: 8px; flex-shrink:0; }
+    .u-img.v-largeFeature { width: 100%;  height: 200px; border-radius: 8px; }
+    .u-img.v-header       { width: 100%;  height: 220px; border-radius: 10px; }
+
+    /* Icon */
+    .u-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; flex-shrink: 0; color: #5f6368;
+    }
+    .u-icon svg { width: 20px; height: 20px; fill: currentColor; }
+
+    /* Divider */
+    .u-divider-h { border: none; border-top: 1px solid #e0e3e8; margin: 2px 0; }
+    .u-divider-v { border: none; border-left: 1px solid #e0e3e8; margin: 0 2px; align-self: stretch; }
+
+    /* Card */
+    .u-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    /* Button */
+    .u-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 5px; padding: 7px 16px; border-radius: 6px;
+      font-size: 14px; font-weight: 500; border: none; cursor: pointer;
+      white-space: nowrap; transition: opacity 0.15s;
+    }
+    .u-btn:hover { opacity: 0.82; }
+    .u-btn.v-primary    { background: #1677FF; color: #fff; }
+    .u-btn.v-default    { background: #fff; color: #1a1a2e; border: 1px solid #e0e3e8; }
+    .u-btn.v-borderless { background: transparent; color: #1677FF; padding: 7px 6px; }
+
+    /* TextField */
+    .u-textfield { display: flex; flex-direction: column; gap: 4px; }
+    .u-textfield label { font-size: 12px; color: #5f6368; font-weight: 500; }
+    .u-textfield input,
+    .u-textfield textarea {
+      width: 100%; padding: 8px 11px;
+      border: 1px solid #e0e3e8; border-radius: 6px;
+      font-size: 14px; font-family: inherit;
+      background: #fafbfc; outline: none;
+      transition: border-color 0.15s;
+      color: #1a1a2e;
+    }
+    .u-textfield input:focus,
+    .u-textfield textarea:focus { border-color: #1677FF; background: #fff; }
+    .u-textfield textarea { resize: vertical; min-height: 80px; }
+
+    /* CheckBox */
+    .u-checkbox { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .u-checkbox input { width: 16px; height: 16px; accent-color: #1677FF; cursor: pointer; }
+    .u-checkbox span { font-size: 14px; color: #1a1a2e; }
+
+    /* ChoicePicker */
+    .u-choice { display: flex; flex-direction: column; gap: 6px; }
+    .u-choice-label { font-size: 12px; color: #5f6368; font-weight: 500; }
+    .u-choice-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .u-chip {
+      padding: 5px 14px; border-radius: 20px;
+      border: 1px solid #e0e3e8; font-size: 13px;
+      background: #fff; color: #5f6368; cursor: pointer;
+      transition: all 0.15s; user-select: none;
+    }
+    .u-chip.sel, .u-chip:hover { border-color: #1677FF; color: #1677FF; background: #e6f4ff; }
+    .u-choice-radios { display: flex; flex-direction: column; gap: 6px; }
+    .u-choice-item { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .u-choice-item input { width: 16px; height: 16px; accent-color: #1677FF; cursor: pointer; }
+    .u-choice-checks { display: flex; flex-direction: column; gap: 6px; }
+
+    /* Slider */
+    .u-slider { display: flex; flex-direction: column; gap: 5px; }
+    .u-slider label { font-size: 12px; color: #5f6368; font-weight: 500; }
+    .u-slider input[type=range] { width: 100%; accent-color: #1677FF; }
+
+    /* DateTimeInput */
+    .u-datetime { display: flex; flex-direction: column; gap: 4px; }
+    .u-datetime label { font-size: 12px; color: #5f6368; font-weight: 500; }
+    .u-datetime input {
+      padding: 8px 11px; border: 1px solid #e0e3e8;
+      border-radius: 6px; font-size: 14px; font-family: inherit;
+      background: #fafbfc; outline: none; color: #1a1a2e;
+      transition: border-color 0.15s;
+    }
+    .u-datetime input:focus { border-color: #1677FF; background: #fff; }
+
+    /* Tabs */
+    .u-tabs { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04); }
+    .u-tabs-hd { display: flex; border-bottom: 1px solid #e0e3e8; background: #fafbfc; overflow-x: auto; }
+    .u-tab-btn {
+      padding: 11px 20px; border: none; background: none; cursor: pointer;
+      font-size: 14px; font-weight: 500; color: #5f6368;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      white-space: nowrap; transition: color 0.15s, border-color 0.15s;
+    }
+    .u-tab-btn.act { color: #1677FF; border-bottom-color: #1677FF; }
+    .u-tab-panel { display: none; padding: 16px; }
+    .u-tab-panel.act { display: block; }
+
+    /* List */
+    .u-list { display: flex; flex-direction: column; gap: 8px; }
+    .u-list.horiz { flex-direction: row; overflow-x: auto; }
+
+    /* Modal */
+    .u-modal-bg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 300;
+      align-items: center; justify-content: center;
+    }
+    .u-modal-bg.open { display: flex; }
+    .u-modal-box {
+      background: #fff; border-radius: 12px;
+      min-width: 320px; max-width: 480px; width: 90%;
+      padding: 24px 20px 18px;
+      box-shadow: 0 10px 36px rgba(0,0,0,0.2);
+    }
+
+    /* Video */
+    .u-video { width: 100%; border-radius: 8px; background: #000; display: block; }
+
+    /* AudioPlayer */
+    .u-audio { width: 100%; }
+    .u-audio-wrap { display: flex; flex-direction: column; gap: 4px; }
+    .u-audio-desc { font-size: 12px; color: #9aa0a6; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ TOOLBAR ═══════════ -->
+<div class="toolbar">
+  <div class="tbar-title">A2UI <em>Playground</em></div>
+  <span class="tbar-badge">v0.9</span>
+  <select class="sample-sel" id="sample-sel" onchange="loadSample(this.value)">
+    <option value="">— 加载示例 —</option>
+    <option value="form">预订表单</option>
+    <option value="list">数据列表</option>
+    <option value="detail">详情页</option>
+    <option value="dashboard">仪表盘</option>
+  </select>
+  <button class="btn btn-def" onclick="fmtJson()" title="Ctrl+Shift+F">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 10h11v2H3zm0-4h18v2H3zm0 8h7v2H3zm13 .58V22l5-3-5-3v2.58z"/></svg>
+    格式化
+  </button>
+  <button class="btn btn-pri" onclick="doRender()" title="Ctrl+Enter">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+    渲染
+  </button>
+</div>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main" id="layout">
+
+  <!-- LEFT: JSON Editor -->
+  <div class="left-panel">
+    <div class="panel-hd">
+      <span class="dot dot-b"></span>
+      输入 A2UI JSON
+      <span style="margin-left:auto;font-size:11px;font-weight:400;color:#9aa0a6" id="lc"></span>
+    </div>
+    <div class="editor-wrap">
+      <textarea id="json-input" spellcheck="false"
+        placeholder='粘贴 A2UI v0.9 三段式 JSON，例如：
+[
+  { "createSurface": { "surfaceId": "my-ui", "catalogId": "..." } },
+  { "updateComponents": { "surfaceId": "my-ui", "components": [
+    { "id": "root", "component": "Column", "children": ["title"] },
+    { "id": "title", "component": "Text", "text": "Hello!", "variant": "h1" }
+  ]}},
+  { "updateDataModel": { "surfaceId": "my-ui", "contents": {} } }
+]'></textarea>
+    </div>
+    <div class="editor-ft">
+      <span class="ed-status s-idle" id="ed-st">— 请输入 JSON 后点击渲染</span>
+      <button class="btn btn-ghost" onclick="clearAll()" style="font-size:12px;padding:3px 7px">清空</button>
+    </div>
+  </div>
+
+  <!-- RESIZER -->
+  <div class="resizer" id="resizer"></div>
+
+  <!-- RIGHT: Preview -->
+  <div class="right-panel">
+    <div class="preview-hd">
+      <div class="preview-hd-title">
+        <span class="dot dot-g"></span>
+        渲染预览
+        <span class="changed-pill" id="chg-pill">● 已修改</span>
+      </div>
+      <button class="btn btn-ok" id="out-btn" onclick="openOut()" disabled>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        确定 · 输出 JSON
+      </button>
+    </div>
+    <div class="preview-scroll">
+      <div class="preview-inner">
+        <div class="empty-state" id="empty">
+          <div class="empty-icon">🎨</div>
+          <div>粘贴 A2UI v0.9 JSON，点击「渲染」预览界面</div>
+          <div style="font-size:12px;color:#9aa0a6">支持三段式消息数组 + 平铺组件列表</div>
+        </div>
+        <div id="preview" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════ OUTPUT MODAL ═══════════ -->
+<div class="modal-bg" id="out-modal">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#16a34a"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+      <h3>输出 JSON</h3>
+      <button class="btn btn-ghost" onclick="closeOut()" style="padding:3px;font-size:17px;line-height:1">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:#5f6368;margin-bottom:10px">当前界面状态对应的 A2UI v0.9 JSON（含用户填写的数据）：</p>
+      <textarea id="out-code" readonly></textarea>
+      <p class="copy-tip" id="copy-tip">点击「复制」可将 JSON 复制到剪贴板</p>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-def" onclick="closeOut()">关闭</button>
+      <button class="btn btn-pri" onclick="copyOut()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+        复制
+      </button>
+      <button class="btn btn-ok" onclick="dlOut()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/></svg>
+        下载 .json
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ JS (下一步注入) ═══════════ -->
+<script>
+/* ═══════════════════════════════════════════════════
+   A2UI v0.9 渲染引擎
+   支持：三段式消息数组、平铺组件、数据绑定、List模板
+   ═══════════════════════════════════════════════════ */
+
+// ── 状态 ──
+let _surface = null;   // { surfaceId, catalogId }
+let _compMap = {};     // id → component对象
+let _dataModel = {};   // contents
+let _rawMessages = []; // 原始三段式数组（用于输出）
+
+// ── SVG 图标库 ──
+const ICONS = {
+  accountCircle:`<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>`,
+  add:`<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>`,
+  arrowBack:`<svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>`,
+  arrowForward:`<svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/></svg>`,
+  attachFile:`<svg viewBox="0 0 24 24"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg>`,
+  calendarToday:`<svg viewBox="0 0 24 24"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>`,
+  call:`<svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>`,
+  check:`<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`,
+  close:`<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`,
+  delete:`<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`,
+  download:`<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/></svg>`,
+  edit:`<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`,
+  error:`<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
+  favorite:`<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+  home:`<svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>`,
+  info:`<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>`,
+  locationOn:`<svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
+  mail:`<svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>`,
+  menu:`<svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>`,
+  moreVert:`<svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`,
+  notifications:`<svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>`,
+  person:`<svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>`,
+  refresh:`<svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>`,
+  search:`<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>`,
+  send:`<svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>`,
+  settings:`<svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>`,
+  share:`<svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>`,
+  star:`<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`,
+  warning:`<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>`,
+  play:`<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`,
+  pause:`<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`,
+  shoppingCart:`<svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96C5 16.1 6.9 18 9 18h12v-2H9.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63H19c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0 0 23.43 5H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>`,
+  upload:`<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8-2V3h2v4h1.17L12 9.17 9.83 7H11zm-6 9h14v2H5z"/></svg>`,
+  visibility:`<svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>`,
+};
+
+function iconSvg(name) {
+  const svg = ICONS[name] || ICONS['info'];
+  return `<span class="u-icon">${svg}</span>`;
+}
+
+// ── JSON Pointer 解析（RFC 6901）──
+function resolvePointer(data, pointer) {
+  if (!pointer || pointer === '/') return data;
+  const parts = pointer.replace(/^\//, '').split('/').map(p => p.replace(/~1/g,'/').replace(/~0/g,'~'));
+  let cur = data;
+  for (const p of parts) {
+    if (cur == null) return undefined;
+    cur = cur[p];
+  }
+  return cur;
+}
+
+// ── 解析数据绑定值 ──
+// binding: 静态值 or { path: "/..." } or { path: "relative" }(模板中)
+function resolveValue(binding, templateData) {
+  if (binding == null) return '';
+  if (typeof binding !== 'object') return String(binding);
+  if (binding.path !== undefined) {
+    const p = String(binding.path);
+    if (p.startsWith('/')) {
+      const v = resolvePointer(_dataModel, p);
+      return v != null ? v : '';
+    } else {
+      // 相对路径（模板内）
+      if (templateData != null && typeof templateData === 'object') {
+        const v = templateData[p];
+        return v != null ? v : '';
+      }
+      return '';
+    }
+  }
+  return '';
+}
+
+// ── 渲染单个组件 ──
+function renderComp(id, templateData) {
+  const comp = _compMap[id];
+  if (!comp) return `<span style="color:#cf1322;font-size:12px">[未找到组件: ${escH(id)}]</span>`;
+  const c = comp.component;
+
+  switch (c) {
+    case 'Column': return renderColumn(comp, templateData);
+    case 'Row':    return renderRow(comp, templateData);
+    case 'List':   return renderList(comp, templateData);
+    case 'Text':   return renderText(comp, templateData);
+    case 'Image':  return renderImage(comp, templateData);
+    case 'Icon':   return renderIcon(comp, templateData);
+    case 'Divider':return renderDivider(comp);
+    case 'Video':  return renderVideo(comp, templateData);
+    case 'AudioPlayer': return renderAudio(comp, templateData);
+    case 'Card':   return renderCard(comp, templateData);
+    case 'Tabs':   return renderTabs(comp, templateData);
+    case 'Modal':  return renderModal(comp, templateData);
+    case 'Button': return renderButton(comp, templateData);
+    case 'TextField':    return renderTextField(comp, templateData);
+    case 'CheckBox':     return renderCheckBox(comp, templateData);
+    case 'ChoicePicker': return renderChoicePicker(comp, templateData);
+    case 'Slider':       return renderSlider(comp, templateData);
+    case 'DateTimeInput':return renderDateTimeInput(comp, templateData);
+    default:
+      return `<div style="padding:8px;border:1px dashed #e0e3e8;border-radius:6px;font-size:12px;color:#9aa0a6">[${escH(c)}]</div>`;
+  }
+}
+
+// ── Children 渲染 ──
+function renderChildren(children, templateData) {
+  if (!children) return '';
+  if (Array.isArray(children)) {
+    return children.map(id => renderComp(String(id), templateData)).join('');
+  }
+  // template: { componentId, path }
+  if (children.componentId && children.path) {
+    const arr = resolvePointer(_dataModel, children.path);
+    if (!Array.isArray(arr)) return '';
+    return arr.map(item => renderComp(children.componentId, item)).join('');
+  }
+  return '';
+}
+
+function justifyClass(v) {
+  const map = { start:'j-start', center:'j-center', end:'j-end', spaceBetween:'j-between', spaceAround:'j-around', spaceEvenly:'j-evenly', stretch:'j-stretch' };
+  return map[v] || '';
+}
+function alignClass(v) {
+  const map = { start:'a-start', center:'a-center', end:'a-end', stretch:'' };
+  return map[v] || '';
+}
+function weightClass(comp) {
+  if (comp.weight) return ` w-${comp.weight}`;
+  return '';
+}
+
+// ── Layout ──
+function renderColumn(comp, td) {
+  const jc = justifyClass(comp.justify), ac = alignClass(comp.align);
+  return `<div class="u-col ${jc} ${ac}${weightClass(comp)}">${renderChildren(comp.children, td)}</div>`;
+}
+function renderRow(comp, td) {
+  const jc = justifyClass(comp.justify), ac = alignClass(comp.align);
+  return `<div class="u-row ${jc} ${ac}${weightClass(comp)}">${renderChildren(comp.children, td)}</div>`;
+}
+function renderList(comp, td) {
+  const horiz = comp.direction === 'horizontal' ? ' horiz' : '';
+  return `<div class="u-list${horiz}${weightClass(comp)}">${renderChildren(comp.children, td)}</div>`;
+}
+
+// ── Display ──
+function renderText(comp, td) {
+  const v = comp.text != null ? resolveValue(comp.text, td) : '';
+  const variant = comp.variant || 'body';
+  return `<span class="u-text v-${escA(variant)}${weightClass(comp)}">${escH(String(v))}</span>`;
+}
+function renderImage(comp, td) {
+  const url = resolveValue(comp.url, td);
+  const variant = comp.variant || 'mediumFeature';
+  const fit = comp.fit || 'cover';
+  return `<img class="u-img v-${escA(variant)}${weightClass(comp)}" src="${escA(String(url))}" alt="" style="object-fit:${fit}" />`;
+}
+function renderIcon(comp, td) {
+  const name = resolveValue(comp.name, td);
+  return iconSvg(String(name));
+}
+function renderDivider(comp) {
+  const axis = comp.axis || 'horizontal';
+  return axis === 'vertical'
+    ? `<div class="u-divider-v"></div>`
+    : `<hr class="u-divider-h" />`;
+}
+function renderVideo(comp, td) {
+  const url = resolveValue(comp.url, td);
+  return `<video class="u-video" controls src="${escA(String(url))}"></video>`;
+}
+function renderAudio(comp, td) {
+  const url = resolveValue(comp.url, td);
+  const desc = comp.description ? resolveValue(comp.description, td) : '';
+  return `<div class="u-audio-wrap">
+    ${desc ? `<span class="u-audio-desc">${escH(String(desc))}</span>` : ''}
+    <audio class="u-audio" controls src="${escA(String(url))}"></audio>
+  </div>`;
+}
+
+// ── Card ──
+function renderCard(comp, td) {
+  const inner = comp.child ? renderComp(String(comp.child), td) : '';
+  return `<div class="u-card${weightClass(comp)}">${inner}</div>`;
+}
+
+// ── Tabs ──
+function renderTabs(comp, td) {
+  if (!Array.isArray(comp.tabs) || !comp.tabs.length) return '';
+  const tid = 'tabs_' + comp.id.replace(/[^a-z0-9]/gi, '_');
+  const headers = comp.tabs.map((t, i) => {
+    const title = t.title != null ? resolveValue(t.title, td) : `Tab ${i+1}`;
+    return `<button class="u-tab-btn${i===0?' act':''}" onclick="switchTab('${tid}',${i},this)">${escH(String(title))}</button>`;
+  }).join('');
+  const panels = comp.tabs.map((t, i) =>
+    `<div class="u-tab-panel${i===0?' act':''}" data-tid="${tid}" data-ti="${i}">${t.child ? renderComp(String(t.child), td) : ''}</div>`
+  ).join('');
+  return `<div class="u-tabs${weightClass(comp)}" id="${tid}"><div class="u-tabs-hd">${headers}</div>${panels}</div>`;
+}
+window.switchTab = function(tid, idx, btn) {
+  document.querySelectorAll(`#${tid} .u-tab-btn`).forEach(b => b.classList.remove('act'));
+  document.querySelectorAll(`[data-tid="${tid}"]`).forEach(p => p.classList.remove('act'));
+  btn.classList.add('act');
+  document.querySelector(`[data-tid="${tid}"][data-ti="${idx}"]`).classList.add('act');
+};
+
+// ── Modal ──
+function renderModal(comp, td) {
+  const mid = 'modal_' + comp.id.replace(/[^a-z0-9]/gi, '_');
+  const triggerEl = comp.trigger ? renderComp(String(comp.trigger), td, mid) : '';
+  const contentEl = comp.content ? renderComp(String(comp.content), td) : '';
+  // Re-render trigger button with modal open logic injected
+  const triggerComp = comp.trigger ? _compMap[comp.trigger] : null;
+  let triggerHtml = '';
+  if (triggerComp && triggerComp.component === 'Button') {
+    triggerHtml = renderButtonWithClick(triggerComp, td, `openModal('${mid}')`);
+  } else {
+    triggerHtml = triggerEl;
+  }
+  return `
+    ${triggerHtml}
+    <div class="u-modal-bg" id="${mid}">
+      <div class="u-modal-box">
+        ${contentEl}
+      </div>
+    </div>`;
+}
+window.openModal = function(id) { document.getElementById(id).classList.add('open'); };
+window.closeModalEl = function(id) { document.getElementById(id).classList.remove('open'); };
+// Close modal on overlay click
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('u-modal-bg')) e.target.classList.remove('open');
+});
+
+// ── Button ──
+function renderButton(comp, td, overrideOnClick) {
+  return renderButtonWithClick(comp, td, overrideOnClick || null);
+}
+function renderButtonWithClick(comp, td, onClickCode) {
+  const variant = comp.variant || 'default';
+  const labelComp = comp.child ? _compMap[String(comp.child)] : null;
+  let inner = '';
+  if (labelComp) {
+    if (labelComp.component === 'Text') {
+      inner = escH(String(resolveValue(labelComp.text, td)));
+    } else if (labelComp.component === 'Icon') {
+      inner = iconSvg(String(resolveValue(labelComp.name, td)));
+    } else {
+      inner = renderComp(String(comp.child), td);
+    }
+  }
+  // Build onclick
+  let oc = '';
+  if (onClickCode) {
+    oc = onClickCode;
+  } else if (comp.action) {
+    const act = comp.action;
+    if (act.event) {
+      oc = `handleAction(${JSON.stringify(act.event.name || '')})`;
+    } else if (act.call === 'openUrl' && act.args && act.args.url) {
+      oc = `window.open(${JSON.stringify(act.args.url)},'_blank')`;
+    } else {
+      oc = `handleAction(${JSON.stringify(JSON.stringify(act))})`;
+    }
+  }
+  return `<button class="u-btn v-${escA(variant)}${weightClass(comp)}"${oc ? ` onclick="${escA(oc)}"` : ''} data-action-id="${escA(comp.id)}">${inner}</button>`;
+}
+window.handleAction = function(name) {
+  console.log('[A2UI Action]', name);
+  markChanged();
+};
+
+// ── TextField ──
+function renderTextField(comp, td) {
+  const label = comp.label != null ? resolveValue(comp.label, td) : '';
+  const val = comp.value != null ? resolveValue(comp.value, td) : '';
+  const variant = comp.variant || 'shortText';
+  const fid = 'tf_' + comp.id.replace(/[^a-z0-9]/gi,'_');
+  const dataField = `data-field="${escA(comp.id)}"`;
+  if (variant === 'longText') {
+    return `<div class="u-textfield${weightClass(comp)}">
+      ${label ? `<label for="${fid}">${escH(String(label))}</label>` : ''}
+      <textarea id="${fid}" ${dataField} oninput="markChanged()">${escH(String(val))}</textarea>
+    </div>`;
+  }
+  const type = variant === 'number' ? 'number' : variant === 'obscured' ? 'password' : 'text';
+  return `<div class="u-textfield${weightClass(comp)}">
+    ${label ? `<label for="${fid}">${escH(String(label))}</label>` : ''}
+    <input id="${fid}" type="${type}" value="${escA(String(val))}" ${dataField} oninput="markChanged()" />
+  </div>`;
+}
+
+// ── CheckBox ──
+function renderCheckBox(comp, td) {
+  const label = comp.label != null ? resolveValue(comp.label, td) : '';
+  const val = comp.value != null ? resolveValue(comp.value, td) : false;
+  const fid = 'cb_' + comp.id.replace(/[^a-z0-9]/gi,'_');
+  return `<label class="u-checkbox${weightClass(comp)}">
+    <input type="checkbox" id="${fid}" data-field="${escA(comp.id)}"${val ? ' checked' : ''} onchange="markChanged()" />
+    <span>${escH(String(label))}</span>
+  </label>`;
+}
+
+// ── ChoicePicker ──
+function renderChoicePicker(comp, td) {
+  const label = comp.label != null ? resolveValue(comp.label, td) : '';
+  const val = comp.value != null ? resolveValue(comp.value, td) : '';
+  const opts = comp.choices || comp.options || [];
+  const variant = comp.variant || 'mutuallyExclusive';
+  const gid = 'cp_' + comp.id.replace(/[^a-z0-9]/gi,'_');
+
+  // ChoicePicker 始终渲染为 chips（A2UI 规范不含 displayStyle 字段）
+  {
+    const chips = opts.map(o => {
+      const ov = typeof o === 'string' ? o : o.value || '';
+      const ol = typeof o === 'string' ? o : o.label || ov;
+      const sel = (variant === 'multipleSelection' ? (Array.isArray(val) ? val.includes(ov) : String(val)===ov) : String(val)===ov);
+      return `<span class="u-chip${sel?' sel':''}" data-field="${escA(comp.id)}" data-val="${escA(ov)}" onclick="toggleChip(this,'${gid}',${variant==='multipleSelection'})">${escH(ol)}</span>`;
+    }).join('');
+    return `<div class="u-choice${weightClass(comp)}">
+      ${label ? `<span class="u-choice-label">${escH(String(label))}</span>` : ''}
+      <div class="u-choice-chips" id="${gid}">${chips}</div>
+    </div>`;
+  }
+}
+window.toggleChip = function(el, gid, multi) {
+  if (!multi) {
+    document.querySelectorAll(`#${gid} .u-chip`).forEach(c => c.classList.remove('sel'));
+    el.classList.add('sel');
+  } else {
+    el.classList.toggle('sel');
+  }
+  markChanged();
+};
+
+// ── Slider ──
+function renderSlider(comp, td) {
+  const label = comp.label != null ? resolveValue(comp.label, td) : '';
+  const val = Number(comp.value != null ? resolveValue(comp.value, td) : 0) || 0;
+  const min = comp.min || 0, max = comp.max || 100;
+  const fid = 'sl_' + comp.id.replace(/[^a-z0-9]/gi,'_');
+  return `<div class="u-slider${weightClass(comp)}">
+    ${label ? `<label for="${fid}">${escH(String(label))}<span id="${fid}_val" style="float:right;color:#9aa0a6">${val}</span></label>` : ''}
+    <input type="range" id="${fid}" min="${min}" max="${max}" value="${val}" data-field="${escA(comp.id)}"
+      oninput="document.getElementById('${fid}_val').textContent=this.value;markChanged()" />
+  </div>`;
+}
+
+// ── DateTimeInput ──
+function renderDateTimeInput(comp, td) {
+  const label = comp.label != null ? resolveValue(comp.label, td) : '';
+  const val = comp.value != null ? resolveValue(comp.value, td) : '';
+  const fid = 'dt_' + comp.id.replace(/[^a-z0-9]/gi,'_');
+  const type = (comp.enableDate && comp.enableTime) ? 'datetime-local'
+    : comp.enableDate ? 'date'
+    : comp.enableTime ? 'time'
+    : 'date';
+  return `<div class="u-datetime${weightClass(comp)}">
+    ${label ? `<label for="${fid}">${escH(String(label))}</label>` : ''}
+    <input type="${type}" id="${fid}" value="${escA(String(val))}" data-field="${escA(comp.id)}" onchange="markChanged()" />
+  </div>`;
+}
+
+// ── Escape helpers ──
+function escH(s) {
+  if (s==null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escA(s) {
+  if (s==null) return '';
+  return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ── themeRef 支持 ──────────────────────────────────────────────────────────
+const PG_THEME_DEFAULTS = {
+  primaryColor: '#1677FF', primaryHoverColor: '#4096FF', primaryTextColor: '#FFFFFF',
+  successColor: '#16a34a', errorColor: '#cf1322', warningColor: '#d97706',
+  textColor: '#1a1a2e', textSecondaryColor: '#5f6368', textDisabledColor: '#9aa0a6',
+  bgColor: '#f0f2f5', surfaceColor: '#ffffff', borderColor: '#e0e3e8',
+  inputBgColor: '#ffffff', inputFocusBorderColor: '#1677FF', overlayBgColor: 'rgba(0,0,0,0.45)',
+  borderRadiusSm: '4px', borderRadiusMd: '8px', borderRadiusLg: '12px', borderRadiusFull: '9999px',
+  fontFamily: '"PingFang SC","Helvetica Neue",Arial,sans-serif',
+  fontSizeBase: '14px', fontSizeSm: '12px', fontSizeLg: '16px',
+  fontSizeXl: '20px', fontSizeXxl: '24px', fontSizeDisplay: '30px',
+  fontWeightNormal: '400', fontWeightMedium: '500', fontWeightBold: '700', lineHeightBase: '1.5715',
+  spacingXs: '4px', spacingSm: '8px', spacingMd: '12px', spacingLg: '16px', spacingXl: '24px',
+  shadowSm: '0 1px 4px rgba(0,0,0,0.06)', shadowMd: '0 4px 12px rgba(0,0,0,0.1)',
+  btnPaddingH: '16px', btnPaddingV: '6px',
+  btnDefaultBg: '#ffffff', btnDefaultBorderColor: '#e0e3e8', btnDefaultTextColor: '#1a1a2e',
+  inputHeight: '36px', inputBorderColor: '#e0e3e8',
+  sliderTrackColor: '#e0e3e8', sliderFillColor: '#1677FF', sliderThumbColor: '#1677FF',
+  tabsActiveColor: '#1677FF', tabsInactiveColor: '#5f6368', tabsIndicatorColor: '#1677FF'
+};
+const PG_TOKEN_TO_CSS = {
+  primaryColor: '--a2ui-primary', primaryHoverColor: '--a2ui-primary-hover',
+  primaryTextColor: '--a2ui-primary-text', successColor: '--a2ui-success',
+  errorColor: '--a2ui-error', warningColor: '--a2ui-warning',
+  textColor: '--a2ui-text-primary', textSecondaryColor: '--a2ui-text-secondary',
+  textDisabledColor: '--a2ui-text-disabled', bgColor: '--a2ui-bg',
+  surfaceColor: '--a2ui-card-bg', borderColor: '--a2ui-border',
+  inputBgColor: '--a2ui-input-bg', inputFocusBorderColor: '--a2ui-input-focus-border',
+  overlayBgColor: '--a2ui-overlay-bg',
+  borderRadiusSm: '--a2ui-radius-sm', borderRadiusMd: '--a2ui-radius',
+  borderRadiusLg: '--a2ui-radius-lg', borderRadiusFull: '--a2ui-radius-full',
+  fontFamily: '--a2ui-font-family', fontSizeBase: '--a2ui-font-size-base',
+  fontSizeSm: '--a2ui-font-size-sm', fontSizeLg: '--a2ui-font-size-lg',
+  fontSizeXl: '--a2ui-font-size-xl', fontSizeXxl: '--a2ui-font-size-xxl',
+  fontSizeDisplay: '--a2ui-font-size-display',
+  fontWeightNormal: '--a2ui-font-weight-normal', fontWeightMedium: '--a2ui-font-weight-medium',
+  fontWeightBold: '--a2ui-font-weight-bold', lineHeightBase: '--a2ui-line-height',
+  spacingXs: '--a2ui-space-xs', spacingSm: '--a2ui-space-sm', spacingMd: '--a2ui-space-md',
+  spacingLg: '--a2ui-space-lg', spacingXl: '--a2ui-space-xl',
+  shadowSm: '--a2ui-shadow-sm', shadowMd: '--a2ui-shadow',
+  btnPaddingH: '--a2ui-btn-padding-h', btnPaddingV: '--a2ui-btn-padding-v',
+  btnDefaultBg: '--a2ui-btn-default-bg', btnDefaultBorderColor: '--a2ui-btn-default-border',
+  btnDefaultTextColor: '--a2ui-btn-default-text',
+  inputHeight: '--a2ui-input-height', inputBorderColor: '--a2ui-input-border',
+  sliderTrackColor: '--a2ui-slider-track', sliderFillColor: '--a2ui-slider-fill',
+  sliderThumbColor: '--a2ui-slider-thumb',
+  tabsActiveColor: '--a2ui-tabs-active', tabsInactiveColor: '--a2ui-tabs-inactive',
+  tabsIndicatorColor: '--a2ui-tabs-indicator'
+};
+function pgResolveThemeTokens(createSurfaceMsg) {
+  const base = (createSurfaceMsg.themeRef) ? Object.assign({}, PG_THEME_DEFAULTS) : {};
+  return Object.assign(base, createSurfaceMsg.theme || {});
+}
+function pgApplyThemeTokens(el, tokens) {
+  const target = el || document.documentElement;
+  for (const [key, val] of Object.entries(tokens)) {
+    const cssVar = PG_TOKEN_TO_CSS[key];
+    if (cssVar && val != null) target.style.setProperty(cssVar, String(val));
+  }
+}
+// ── end themeRef 支持 ──────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════
+// 解析三段式消息
+// ═══════════════════════════════════════════
+function parseMessages(msgs) {
+  _surface = null; _compMap = {}; _dataModel = {};
+  if (!Array.isArray(msgs)) {
+    // 尝试兼容单个消息对象
+    msgs = [msgs];
+  }
+  for (const msg of msgs) {
+    if (msg.createSurface) {
+      _surface = msg.createSurface;
+    } else if (msg.updateComponents) {
+      const comps = msg.updateComponents.components || [];
+      for (const comp of comps) {
+        if (comp.id) _compMap[comp.id] = comp;
+      }
+    } else if (msg.updateDataModel) {
+      _dataModel = msg.updateDataModel.contents || {};
+    }
+  }
+  if (!_surface && Object.keys(_compMap).length > 0) {
+    _surface = { surfaceId: 'unknown' };
+  }
+}
+
+// ═══════════════════════════════════════════
+// 找根组件（第一个没被其他人引用的组件）
+// ═══════════════════════════════════════════
+function findRootId() {
+  const allIds = Object.keys(_compMap);
+  if (allIds.length === 0) return null;
+  // 收集所有被引用的 ID
+  const referenced = new Set();
+  for (const comp of Object.values(_compMap)) {
+    // children
+    if (Array.isArray(comp.children)) comp.children.forEach(id => referenced.add(String(id)));
+    else if (comp.children && comp.children.componentId) referenced.add(comp.children.componentId);
+    // child / trigger / content
+    ['child','trigger','content'].forEach(f => { if (comp[f]) referenced.add(String(comp[f])); });
+    // tabs
+    if (Array.isArray(comp.tabs)) comp.tabs.forEach(t => { if (t.child) referenced.add(String(t.child)); });
+  }
+  // 未被引用的 = 根
+  const roots = allIds.filter(id => !referenced.has(id));
+  if (roots.length === 1) return roots[0];
+  if (roots.length > 1) {
+    // 优先选名为 root/main/surface/page 的
+    for (const r of ['root','main','surface','page','layout']) {
+      if (roots.includes(r)) return r;
+    }
+    return roots[0];
+  }
+  // fallback
+  return allIds[0];
+}
+
+// ═══════════════════════════════════════════
+// 主渲染入口
+// ═══════════════════════════════════════════
+function doRender() {
+  const text = document.getElementById('json-input').value.trim();
+  if (!text) { setStatus('err', '✗ 请先输入 JSON'); return; }
+
+  let parsed;
+  try { parsed = JSON.parse(text); }
+  catch(e) { setStatus('err', '✗ JSON 解析失败: ' + e.message); return; }
+
+  try {
+    parseMessages(parsed);
+  } catch(e) {
+    setStatus('err', '✗ 消息解析失败: ' + e.message);
+    return;
+  }
+
+  // themeRef 支持：解析 createSurface 的 themeRef + theme 并应用 CSS 变量
+  if (_surface) {
+    const tokens = pgResolveThemeTokens(_surface);
+    const preview = document.getElementById('preview');
+    pgApplyThemeTokens(preview, tokens);
+  }
+
+  _rawMessages = parsed;
+
+  const rootId = findRootId();
+  const preview = document.getElementById('preview');
+  document.getElementById('empty').style.display = 'none';
+  preview.style.display = 'block';
+
+  if (!rootId) {
+    preview.innerHTML = `<div class="render-err"><strong>找不到组件</strong><br>updateComponents.components 数组为空或缺失。</div>`;
+    setStatus('err', '✗ 无可渲染组件');
+    return;
+  }
+
+  try {
+    preview.innerHTML = renderComp(rootId, null);
+    setStatus('ok', `✓ 渲染成功（根组件: ${rootId}）`);
+    document.getElementById('out-btn').disabled = false;
+    document.getElementById('chg-pill').classList.remove('show');
+  } catch(e) {
+    preview.innerHTML = `<div class="render-err"><strong>渲染错误：</strong><br>${escH(e.message)}<code>${escH(e.stack||'')}</code></div>`;
+    setStatus('err', '✗ 渲染异常');
+    console.error('[A2UI Render]', e);
+  }
+}
+
+// ═══════════════════════════════════════════
+// 收集 DOM 状态 → 回写 dataModel
+// ═══════════════════════════════════════════
+function collectState() {
+  const preview = document.getElementById('preview');
+  const updated = JSON.parse(JSON.stringify(_rawMessages || []));
+
+  // 找 updateDataModel 消息
+  let dmMsg = null;
+  for (const msg of updated) {
+    if (msg.updateDataModel) { dmMsg = msg.updateDataModel; break; }
+  }
+  if (!dmMsg) {
+    // 追加一个
+    const sid = _surface ? _surface.surfaceId : 'unknown';
+    updated.push({ updateDataModel: { surfaceId: sid, contents: {} } });
+    dmMsg = updated[updated.length-1].updateDataModel;
+  }
+
+  const dm = JSON.parse(JSON.stringify(_dataModel));
+
+  // ── 1. 普通表单控件（input / textarea / select）──
+  preview.querySelectorAll('[data-field]').forEach(el => {
+    if (el.classList.contains('u-chip')) return; // chip 单独处理
+    const fid = el.getAttribute('data-field');
+    const comp = _compMap[fid];
+    if (!comp) return;
+    let newVal;
+    if (el.tagName === 'INPUT' && el.type === 'checkbox') newVal = el.checked;
+    else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') newVal = el.value;
+    else if (el.tagName === 'SELECT') newVal = el.value;
+    else return;
+    writeBack(comp, fid, newVal, dm, updated);
+  });
+
+  // ── 2. ChoicePicker（chips 容器）──
+  // 通过 data-choice-id 找到每个 ChoicePicker 的容器，收集选中的 chip
+  preview.querySelectorAll('.u-choice-chips[id]').forEach(container => {
+    // gid = 'cp_' + comp.id，找回 comp.id
+    const gid = container.id; // e.g. 'cp_city_picker'
+    // 找对应的 comp（id 存在 chip 的 data-field 中）
+    const firstChip = container.querySelector('.u-chip[data-field]');
+    if (!firstChip) return;
+    const fid = firstChip.getAttribute('data-field');
+    const comp = _compMap[fid];
+    if (!comp) return;
+    const variant = comp.variant || 'mutuallyExclusive';
+    const selChips = Array.from(container.querySelectorAll('.u-chip.sel'));
+    const selVals = selChips.map(c => c.getAttribute('data-val'));
+    // mutuallyExclusive → 单选，但规范要求写入数组格式
+    const newVal = variant === 'multipleSelection' ? selVals : (selVals.length ? selVals : []);
+    writeBack(comp, fid, newVal, dm, updated);
+  });
+
+  // ── 3. ChoicePicker radio/checkbox 模式 ──
+  const processedChoiceGroups = new Set();
+  preview.querySelectorAll('input[type=radio][name], input[type=checkbox][name]').forEach(el => {
+    const gname = el.getAttribute('name');
+    if (processedChoiceGroups.has(gname)) return;
+    processedChoiceGroups.add(gname);
+    const isMulti = el.type === 'checkbox';
+    // 找 comp.id：radio/checkbox 的 id 格式为 gname_value，gname 格式为 cp_compid
+    const compId = gname.replace(/^cp_/, '').replace(/_/g, '-'); // 近似还原
+    // 找更准确的方式：通过 gname 找第一个 label 里的 input，再找 comp
+    const allInGroup = preview.querySelectorAll(`input[name="${gname}"]`);
+    if (!allInGroup.length) return;
+    // 找 comp：通过 container 往上找 .u-choice 再找关联 comp
+    // 简单方法：gname = 'cp_' + compId（compId 是 id 字段去除特殊字符）
+    // 遍历 _compMap 找 component=ChoicePicker 且 id 匹配
+    const compEntry = Object.values(_compMap).find(c =>
+      c.component === 'ChoicePicker' &&
+      ('cp_' + c.id.replace(/[^a-z0-9]/gi,'_')) === gname
+    );
+    if (!compEntry) return;
+    const selInputs = Array.from(allInGroup).filter(i => i.checked);
+    const selVals = selInputs.map(i => i.value);
+    const newVal = isMulti ? selVals : (selVals.length ? selVals : []);
+    writeBack(compEntry, compEntry.id, newVal, dm, updated);
+  });
+
+  dmMsg.contents = dm;
+  return updated;
+}
+
+// ── 写回辅助函数 ──
+function writeBack(comp, fid, newVal, dm, updated) {
+  const binding = comp.value;
+  if (binding && typeof binding === 'object' && binding.path && binding.path.startsWith('/')) {
+    setPointer(dm, binding.path, newVal);
+  } else {
+    for (const msg of updated) {
+      if (msg.updateComponents) {
+        const c = msg.updateComponents.components.find(x => x.id === fid);
+        if (c) { c.value = newVal; }
+      }
+    }
+  }
+}
+
+function setPointer(obj, pointer, value) {
+  const parts = pointer.replace(/^\//, '').split('/').map(p => p.replace(/~1/g,'/').replace(/~0/g,'~'));
+  let cur = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (cur[parts[i]] == null) cur[parts[i]] = {};
+    cur = cur[parts[i]];
+  }
+  cur[parts[parts.length-1]] = value;
+}
+
+// ═══════════════════════════════════════════
+// 输出 Modal
+// ═══════════════════════════════════════════
+function openOut() {
+  const out = collectState();
+  document.getElementById('out-code').value = JSON.stringify(out, null, 2);
+  document.getElementById('copy-tip').textContent = '点击「复制」可将 JSON 复制到剪贴板';
+  document.getElementById('copy-tip').className = 'copy-tip';
+  document.getElementById('out-modal').classList.add('open');
+}
+function closeOut() { document.getElementById('out-modal').classList.remove('open'); }
+function copyOut() {
+  const el = document.getElementById('out-code');
+  el.select();
+  navigator.clipboard.writeText(el.value).then(() => {
+    const tip = document.getElementById('copy-tip');
+    tip.textContent = '✓ 已复制！'; tip.className = 'copy-tip ok';
+    setTimeout(() => { tip.textContent='点击「复制」可将 JSON 复制到剪贴板'; tip.className='copy-tip'; }, 2000);
+  }).catch(() => document.execCommand('copy'));
+}
+function dlOut() {
+  const blob = new Blob([document.getElementById('out-code').value], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = ((_surface && _surface.surfaceId) || 'a2ui-output') + '.json';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+document.getElementById('out-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('out-modal')) closeOut();
+});
+
+// ═══════════════════════════════════════════
+// Editor helpers
+// ═══════════════════════════════════════════
+function setStatus(type, msg) {
+  const el = document.getElementById('ed-st');
+  el.className = 'ed-status s-' + type;
+  el.textContent = msg;
+}
+
+const jinput = document.getElementById('json-input');
+jinput.addEventListener('input', () => {
+  document.getElementById('lc').textContent = jinput.value.split('\n').length + ' 行';
+  try { JSON.parse(jinput.value); setStatus('ok','✓ 格式正确'); }
+  catch(e) { setStatus('err','✗ ' + e.message.slice(0,60)); }
+  if (!jinput.value.trim()) setStatus('idle','— 请输入 JSON 后点击渲染');
+});
+jinput.addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s=jinput.selectionStart, end=jinput.selectionEnd;
+    jinput.value = jinput.value.slice(0,s)+'  '+jinput.value.slice(end);
+    jinput.selectionStart = jinput.selectionEnd = s+2;
+  }
+  if ((e.ctrlKey||e.metaKey) && e.key==='Enter') doRender();
+  if ((e.ctrlKey||e.metaKey) && e.shiftKey && e.key==='F') { e.preventDefault(); fmtJson(); }
+});
+
+function fmtJson() {
+  try {
+    jinput.value = JSON.stringify(JSON.parse(jinput.value), null, 2);
+    document.getElementById('lc').textContent = jinput.value.split('\n').length + ' 行';
+    setStatus('ok','✓ 已格式化');
+  } catch(e) { setStatus('err','✗ 格式错误，无法格式化'); }
+}
+
+function clearAll() {
+  jinput.value = '';
+  setStatus('idle','— 请输入 JSON 后点击渲染');
+  document.getElementById('lc').textContent = '';
+  document.getElementById('preview').style.display='none';
+  document.getElementById('preview').innerHTML='';
+  document.getElementById('empty').style.display='flex';
+  document.getElementById('out-btn').disabled=true;
+  document.getElementById('chg-pill').classList.remove('show');
+  _surface=null; _compMap={}; _dataModel={}; _rawMessages=[];
+}
+
+window.markChanged = function() {
+  document.getElementById('chg-pill').classList.add('show');
+};
+
+// ═══════════════════════════════════════════
+// Resize handle
+// ═══════════════════════════════════════════
+(function(){
+  const handle=document.getElementById('resizer');
+  const left=document.querySelector('.left-panel');
+  const layout=document.getElementById('layout');
+  let drag=false, sx=0, sw=0;
+  handle.addEventListener('mousedown', e=>{drag=true;sx=e.clientX;sw=left.offsetWidth;handle.classList.add('drag');document.body.style.userSelect='none';document.body.style.cursor='col-resize';});
+  document.addEventListener('mousemove', e=>{if(!drag)return;const w=Math.max(240,Math.min(680,sw+e.clientX-sx));layout.style.gridTemplateColumns=`${w}px 4px 1fr`;});
+  document.addEventListener('mouseup', ()=>{if(!drag)return;drag=false;handle.classList.remove('drag');document.body.style.userSelect='';document.body.style.cursor='';});
+})();
+
+// ═══════════════════════════════════════════
+// 示例数据
+// ═══════════════════════════════════════════
+const SAMPLES = {
+form: [
+  { "createSurface": { "surfaceId": "booking-form", "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json" } },
+  { "updateComponents": { "surfaceId": "booking-form", "components": [
+    { "id": "root", "component": "Column", "children": ["page-title","form-card","action-row"] },
+    { "id": "page-title", "component": "Text", "text": "预订酒店", "variant": "h1" },
+    { "id": "form-card", "component": "Card", "child": "form-body" },
+    { "id": "form-body", "component": "Column", "children": ["name-field","phone-field","city-picker","date-row","guests-slider","notes-field","agree-check"] },
+    { "id": "name-field", "component": "TextField", "label": "姓名", "value": { "path": "/form/name" }, "variant": "shortText" },
+    { "id": "phone-field", "component": "TextField", "label": "手机号", "value": { "path": "/form/phone" }, "variant": "shortText" },
+    { "id": "city-picker", "component": "ChoicePicker", "label": "目的地城市", "options": [{"label":"北京","value":"beijing"},{"label":"上海","value":"shanghai"},{"label":"广州","value":"guangzhou"},{"label":"成都","value":"chengdu"}], "value": { "path": "/form/city" }, "variant": "mutuallyExclusive", "displayStyle": "chips" },
+    { "id": "date-row", "component": "Row", "children": ["checkin-date","checkout-date"], "justify": "start" },
+    { "id": "checkin-date", "component": "DateTimeInput", "label": "入住日期", "value": { "path": "/form/checkin" }, "enableDate": true, "weight": 1 },
+    { "id": "checkout-date", "component": "DateTimeInput", "label": "退房日期", "value": { "path": "/form/checkout" }, "enableDate": true, "weight": 1 },
+    { "id": "guests-slider", "component": "Slider", "label": "入住人数", "value": { "path": "/form/guests" }, "min": 1, "max": 10 },
+    { "id": "notes-field", "component": "TextField", "label": "备注", "value": { "path": "/form/notes" }, "variant": "longText" },
+    { "id": "agree-check", "component": "CheckBox", "label": "我已阅读并同意预订条款", "value": { "path": "/form/agreed" } },
+    { "id": "action-row", "component": "Row", "children": ["cancel-btn","submit-btn"], "justify": "end" },
+    { "id": "cancel-btn-text", "component": "Text", "text": "取消" },
+    { "id": "cancel-btn", "component": "Button", "child": "cancel-btn-text", "variant": "default", "action": { "event": { "name": "cancel" } } },
+    { "id": "submit-btn-text", "component": "Text", "text": "立即预订" },
+    { "id": "submit-btn", "component": "Button", "child": "submit-btn-text", "variant": "primary", "action": { "event": { "name": "submit_booking" } } }
+  ]}},
+  { "updateDataModel": { "surfaceId": "booking-form", "contents": { "form": { "name": "", "phone": "", "city": "shanghai", "checkin": "", "checkout": "", "guests": 2, "notes": "", "agreed": false } } } }
+],
+list: [
+  { "createSurface": { "surfaceId": "restaurant-list", "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json" } },
+  { "updateComponents": { "surfaceId": "restaurant-list", "components": [
+    { "id": "root", "component": "Column", "children": ["hd","restaurants-list"] },
+    { "id": "hd", "component": "Row", "children": ["page-title","add-btn"], "justify": "spaceBetween" },
+    { "id": "page-title", "component": "Text", "text": "附近餐厅", "variant": "h1" },
+    { "id": "add-btn-icon", "component": "Icon", "name": "add" },
+    { "id": "add-btn", "component": "Button", "child": "add-btn-icon", "variant": "primary", "action": { "event": { "name": "add_restaurant" } } },
+    { "id": "restaurants-list", "component": "List", "children": { "componentId": "restaurant-card", "path": "/restaurants" } },
+    { "id": "restaurant-card", "component": "Card", "child": "card-row" },
+    { "id": "card-row", "component": "Row", "children": ["food-img","card-info"], "align": "start" },
+    { "id": "food-img", "component": "Image", "url": { "path": "imageUrl" }, "variant": "smallFeature" },
+    { "id": "card-info", "component": "Column", "children": ["r-name","r-desc","r-meta"], "weight": 1 },
+    { "id": "r-name", "component": "Text", "text": { "path": "name" }, "variant": "h3" },
+    { "id": "r-desc", "component": "Text", "text": { "path": "cuisine" }, "variant": "body" },
+    { "id": "r-meta", "component": "Text", "text": { "path": "rating" }, "variant": "caption" }
+  ]}},
+  { "updateDataModel": { "surfaceId": "restaurant-list", "contents": { "restaurants": [
+    { "name": "御品轩粤菜馆", "cuisine": "粤菜 · 海鲜", "rating": "⭐ 4.8 · 1.2km · ¥180/人", "imageUrl": "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=150&h=150&fit=crop" },
+    { "name": "老北京炸酱面", "cuisine": "北京菜 · 面食", "rating": "⭐ 4.6 · 0.8km · ¥45/人", "imageUrl": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=150&h=150&fit=crop" },
+    { "name": "川香麻辣烫", "cuisine": "川菜 · 火锅", "rating": "⭐ 4.5 · 2.1km · ¥60/人", "imageUrl": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=150&h=150&fit=crop" }
+  ]}}}
+],
+detail: [
+  { "createSurface": { "surfaceId": "product-detail", "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json" } },
+  { "updateComponents": { "surfaceId": "product-detail", "components": [
+    { "id": "root", "component": "Column", "children": ["hero","info-card","action-row"] },
+    { "id": "hero", "component": "Image", "url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=740&h=220&fit=crop", "variant": "header" },
+    { "id": "info-card", "component": "Card", "child": "info-body" },
+    { "id": "info-body", "component": "Column", "children": ["prod-name","prod-price","divider1","prod-desc","feature-tabs"] },
+    { "id": "prod-name", "component": "Text", "text": { "path": "/product/name" }, "variant": "h1" },
+    { "id": "prod-price", "component": "Text", "text": { "path": "/product/price" }, "variant": "h3" },
+    { "id": "divider1", "component": "Divider" },
+    { "id": "prod-desc", "component": "Text", "text": { "path": "/product/description" }, "variant": "body" },
+    { "id": "feature-tabs", "component": "Tabs", "tabs": [
+      { "title": "参数", "child": "specs-col" },
+      { "title": "评价", "child": "reviews-col" }
+    ]},
+    { "id": "specs-col", "component": "Column", "children": ["spec1","spec2","spec3"] },
+    { "id": "spec1", "component": "Text", "text": "机芯：瑞士 ETA 2824-2 自动上链", "variant": "body" },
+    { "id": "spec2", "component": "Text", "text": "表径：40mm · 厚度：11mm", "variant": "body" },
+    { "id": "spec3", "component": "Text", "text": "防水：100m · 表带：不锈钢", "variant": "body" },
+    { "id": "reviews-col", "component": "Column", "children": ["rev1","rev2"] },
+    { "id": "rev1", "component": "Text", "text": "⭐⭐⭐⭐⭐  做工精良，走时准确，非常满意！", "variant": "body" },
+    { "id": "rev2", "component": "Text", "text": "⭐⭐⭐⭐  佩戴舒适，外观大气，推荐购买。", "variant": "body" },
+    { "id": "action-row", "component": "Row", "children": ["fav-btn","cart-btn","buy-btn"], "justify": "end" },
+    { "id": "fav-icon", "component": "Icon", "name": "favorite" },
+    { "id": "fav-btn", "component": "Button", "child": "fav-icon", "variant": "default", "action": { "event": { "name": "add_favorite" } } },
+    { "id": "cart-text", "component": "Text", "text": "加入购物车" },
+    { "id": "cart-btn", "component": "Button", "child": "cart-text", "variant": "default", "action": { "event": { "name": "add_to_cart" } } },
+    { "id": "buy-text", "component": "Text", "text": "立即购买" },
+    { "id": "buy-btn", "component": "Button", "child": "buy-text", "variant": "primary", "action": { "event": { "name": "buy_now" } } }
+  ]}},
+  { "updateDataModel": { "surfaceId": "product-detail", "contents": { "product": { "name": "经典机械腕表", "price": "¥ 3,880", "description": "采用瑞士进口机芯，316L不锈钢表壳，蓝宝石镜面，展现经典工艺与现代设计的完美融合。限量发售，附原厂保修卡。" } } } }
+],
+dashboard: [
+  { "createSurface": { "surfaceId": "analytics-dashboard", "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json" } },
+  { "updateComponents": { "surfaceId": "analytics-dashboard", "components": [
+    { "id": "root", "component": "Column", "children": ["dash-title","stats-row","main-tabs"] },
+    { "id": "dash-title", "component": "Text", "text": "数据概览", "variant": "h1" },
+    { "id": "stats-row", "component": "Row", "children": ["stat1","stat2","stat3","stat4"], "justify": "spaceBetween" },
+    { "id": "stat1", "component": "Card", "child": "s1-col", "weight": 1 },
+    { "id": "s1-col", "component": "Column", "children": ["s1-val","s1-label"] },
+    { "id": "s1-val", "component": "Text", "text": "128,640", "variant": "h2" },
+    { "id": "s1-label", "component": "Text", "text": "总用户数", "variant": "caption" },
+    { "id": "stat2", "component": "Card", "child": "s2-col", "weight": 1 },
+    { "id": "s2-col", "component": "Column", "children": ["s2-val","s2-label"] },
+    { "id": "s2-val", "component": "Text", "text": "¥ 58.3万", "variant": "h2" },
+    { "id": "s2-label", "component": "Text", "text": "本月营收", "variant": "caption" },
+    { "id": "stat3", "component": "Card", "child": "s3-col", "weight": 1 },
+    { "id": "s3-col", "component": "Column", "children": ["s3-val","s3-label"] },
+    { "id": "s3-val", "component": "Text", "text": "4,218", "variant": "h2" },
+    { "id": "s3-label", "component": "Text", "text": "今日订单", "variant": "caption" },
+    { "id": "stat4", "component": "Card", "child": "s4-col", "weight": 1 },
+    { "id": "s4-col", "component": "Column", "children": ["s4-val","s4-label"] },
+    { "id": "s4-val", "component": "Text", "text": "98.2%", "variant": "h2" },
+    { "id": "s4-label", "component": "Text", "text": "服务可用率", "variant": "caption" },
+    { "id": "main-tabs", "component": "Tabs", "tabs": [
+      { "title": "销售趋势", "child": "sales-panel" },
+      { "title": "用户分析", "child": "user-panel" },
+      { "title": "系统状态", "child": "sys-panel" }
+    ]},
+    { "id": "sales-panel", "component": "Column", "children": ["sales-note"] },
+    { "id": "sales-note", "component": "Text", "text": "📈  本月销售同比增长 +23.4%，环比增长 +8.1%。峰值出现在 3 月 15 日（节假日促销期间）。", "variant": "body" },
+    { "id": "user-panel", "component": "Column", "children": ["user-note"] },
+    { "id": "user-note", "component": "Text", "text": "👥  新增用户 12,048 人，留存率 72.3%。主要来源：搜索推荐 45%，社交分享 30%，广告投放 25%。", "variant": "body" },
+    { "id": "sys-panel", "component": "Column", "children": ["sys-note"] },
+    { "id": "sys-note", "component": "Text", "text": "🟢  所有服务运行正常。平均响应时间 120ms，P99 延迟 340ms。近 30 天无重大故障。", "variant": "body" }
+  ]}},
+  { "updateDataModel": { "surfaceId": "analytics-dashboard", "contents": {} } }
+]
+};
+
+function loadSample(key) {
+  if (!key || !SAMPLES[key]) return;
+  document.getElementById('sample-sel').value = '';
+  jinput.value = JSON.stringify(SAMPLES[key], null, 2);
+  document.getElementById('lc').textContent = jinput.value.split('\n').length + ' 行';
+  setStatus('ok','✓ 示例已加载');
+  doRender();
+}
+</script>
+
+</body>
+</html>

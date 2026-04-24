@@ -1,0 +1,217 @@
+[
+  {
+    "createSurface": {
+      "surfaceId": "product-detail",
+      "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json",
+      "theme": {
+        "primaryColor": "#1677FF"
+      }
+    }
+  },
+  {
+    "updateComponents": {
+      "surfaceId": "product-detail",
+      "components": [
+        {
+          "id": "root",
+          "component": "Column",
+          "children": [
+            "product-hero",
+            "product-info-card",
+            "divider1",
+            "action-row",
+            "confirm-modal"
+          ]
+        },
+        {
+          "id": "product-hero",
+          "component": "Image",
+          "url": { "path": "/product/imageUrl" },
+          "variant": "largeFeature",
+          "fit": "cover"
+        },
+        {
+          "id": "product-info-card",
+          "component": "Card",
+          "child": "product-info-body"
+        },
+        {
+          "id": "product-info-body",
+          "component": "Column",
+          "children": [
+            "product-name",
+            "product-price",
+            "product-rating-row",
+            "product-desc-title",
+            "product-description"
+          ]
+        },
+        {
+          "id": "product-name",
+          "component": "Text",
+          "text": { "path": "/product/name" },
+          "variant": "h1"
+        },
+        {
+          "id": "product-price",
+          "component": "Text",
+          "text": { "path": "/product/priceFormatted" },
+          "variant": "h2"
+        },
+        {
+          "id": "product-rating-row",
+          "component": "Row",
+          "children": ["rating-icon", "rating-text"],
+          "align": "center"
+        },
+        {
+          "id": "rating-icon",
+          "component": "Icon",
+          "name": "star"
+        },
+        {
+          "id": "rating-text",
+          "component": "Text",
+          "text": { "path": "/product/ratingLabel" },
+          "variant": "body"
+        },
+        {
+          "id": "product-desc-title",
+          "component": "Text",
+          "text": "商品描述",
+          "variant": "h3"
+        },
+        {
+          "id": "product-description",
+          "component": "Text",
+          "text": { "path": "/product/description" },
+          "variant": "body"
+        },
+        {
+          "id": "divider1",
+          "component": "Divider"
+        },
+        {
+          "id": "action-row",
+          "component": "Row",
+          "children": ["wishlist-btn", "cart-btn", "buy-btn"],
+          "justify": "spaceBetween"
+        },
+        {
+          "id": "wishlist-btn",
+          "component": "Button",
+          "child": "wishlist-icon",
+          "variant": "borderless",
+          "action": { "event": { "name": "add_to_wishlist" } }
+        },
+        {
+          "id": "wishlist-icon",
+          "component": "Icon",
+          "name": "favorite"
+        },
+        {
+          "id": "cart-btn",
+          "component": "Button",
+          "child": "cart-text",
+          "variant": "default",
+          "action": { "event": { "name": "add_to_cart" } }
+        },
+        {
+          "id": "cart-text",
+          "component": "Text",
+          "text": "加入购物车"
+        },
+        {
+          "id": "buy-btn",
+          "component": "Button",
+          "child": "buy-text",
+          "variant": "primary",
+          "action": { "event": { "name": "open_confirm" } }
+        },
+        {
+          "id": "buy-text",
+          "component": "Text",
+          "text": "立即购买"
+        },
+        {
+          "id": "confirm-modal",
+          "component": "Modal",
+          "trigger": "buy-btn",
+          "content": "modal-content"
+        },
+        {
+          "id": "modal-content",
+          "component": "Column",
+          "children": [
+            "modal-title",
+            "modal-product-name",
+            "modal-price",
+            "modal-actions"
+          ]
+        },
+        {
+          "id": "modal-title",
+          "component": "Text",
+          "text": "确认购买",
+          "variant": "h2"
+        },
+        {
+          "id": "modal-product-name",
+          "component": "Text",
+          "text": { "path": "/product/name" },
+          "variant": "body"
+        },
+        {
+          "id": "modal-price",
+          "component": "Text",
+          "text": { "path": "/product/priceFormatted" },
+          "variant": "h3"
+        },
+        {
+          "id": "modal-actions",
+          "component": "Row",
+          "children": ["modal-cancel-btn", "modal-confirm-btn"],
+          "justify": "end"
+        },
+        {
+          "id": "modal-cancel-btn",
+          "component": "Button",
+          "child": "modal-cancel-text",
+          "variant": "borderless",
+          "action": { "event": { "name": "cancel_purchase" } }
+        },
+        {
+          "id": "modal-cancel-text",
+          "component": "Text",
+          "text": "取消"
+        },
+        {
+          "id": "modal-confirm-btn",
+          "component": "Button",
+          "child": "modal-confirm-text",
+          "variant": "primary",
+          "action": { "event": { "name": "confirm_purchase" } }
+        },
+        {
+          "id": "modal-confirm-text",
+          "component": "Text",
+          "text": "确认付款"
+        }
+      ]
+    }
+  },
+  {
+    "updateDataModel": {
+      "surfaceId": "product-detail",
+      "contents": {
+        "product": {
+          "name": "无线蓝牙耳机 Pro Max",
+          "priceFormatted": "¥ 1,299",
+          "ratingLabel": "4.8 分（3.2k 评价）",
+          "description": "采用最新主动降噪技术，佩戴舒适，续航长达 30 小时。支持多设备无缝切换，适合商务人士和音乐爱好者。",
+          "imageUrl": "https://example.com/headphone-pro.jpg"
+        }
+      }
+    }
+  }
+]

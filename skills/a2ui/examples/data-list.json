@@ -1,0 +1,150 @@
+[
+  {
+    "createSurface": {
+      "surfaceId": "restaurant-list",
+      "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json",
+      "theme": {
+        "primaryColor": "#1677FF"
+      }
+    }
+  },
+  {
+    "updateComponents": {
+      "surfaceId": "restaurant-list",
+      "components": [
+        {
+          "id": "root",
+          "component": "Column",
+          "children": ["page-header", "restaurant-list"]
+        },
+        {
+          "id": "page-header",
+          "component": "Row",
+          "children": ["page-title", "count-text"],
+          "justify": "spaceBetween",
+          "align": "center"
+        },
+        {
+          "id": "page-title",
+          "component": "Text",
+          "text": "附近餐厅",
+          "variant": "h1"
+        },
+        {
+          "id": "count-text",
+          "component": "Text",
+          "text": { "path": "/meta/countLabel" },
+          "variant": "caption"
+        },
+        {
+          "id": "restaurant-list",
+          "component": "List",
+          "children": { "componentId": "restaurant-card", "path": "/restaurants" },
+          "direction": "vertical"
+        },
+        {
+          "id": "restaurant-card",
+          "component": "Card",
+          "child": "card-content"
+        },
+        {
+          "id": "card-content",
+          "component": "Row",
+          "children": ["card-image", "card-info"],
+          "align": "start"
+        },
+        {
+          "id": "card-image",
+          "component": "Image",
+          "url": { "path": "imageUrl" },
+          "variant": "smallFeature",
+          "fit": "cover"
+        },
+        {
+          "id": "card-info",
+          "component": "Column",
+          "children": ["rest-name", "rest-address", "rest-rating", "card-actions"],
+          "weight": 1
+        },
+        {
+          "id": "rest-name",
+          "component": "Text",
+          "text": { "path": "name" },
+          "variant": "h3"
+        },
+        {
+          "id": "rest-address",
+          "component": "Text",
+          "text": { "path": "address" },
+          "variant": "caption"
+        },
+        {
+          "id": "rest-rating",
+          "component": "Text",
+          "text": { "path": "rating" },
+          "variant": "body"
+        },
+        {
+          "id": "card-actions",
+          "component": "Row",
+          "children": ["view-btn", "book-btn"],
+          "justify": "end"
+        },
+        {
+          "id": "view-btn",
+          "component": "Button",
+          "child": "view-text",
+          "variant": "borderless",
+          "action": { "event": { "name": "view_detail" } }
+        },
+        {
+          "id": "view-text",
+          "component": "Text",
+          "text": "查看详情"
+        },
+        {
+          "id": "book-btn",
+          "component": "Button",
+          "child": "book-text",
+          "variant": "primary",
+          "action": { "event": { "name": "book_restaurant" } }
+        },
+        {
+          "id": "book-text",
+          "component": "Text",
+          "text": "预订"
+        }
+      ]
+    }
+  },
+  {
+    "updateDataModel": {
+      "surfaceId": "restaurant-list",
+      "contents": {
+        "meta": {
+          "countLabel": "共 3 家"
+        },
+        "restaurants": [
+          {
+            "name": "Xi'an Famous Foods",
+            "imageUrl": "https://example.com/xian.jpg",
+            "rating": "★★★★☆  4.2 (1.2k reviews)",
+            "address": "81 St Marks Pl, New York, NY 10003"
+          },
+          {
+            "name": "Han Dynasty",
+            "imageUrl": "https://example.com/han.jpg",
+            "rating": "★★★★☆  4.1 (980 reviews)",
+            "address": "90 3rd Ave, New York, NY 10003"
+          },
+          {
+            "name": "RedFarm",
+            "imageUrl": "https://example.com/redfarm.jpg",
+            "rating": "★★★★☆  4.3 (2.1k reviews)",
+            "address": "529 Hudson St, New York, NY 10014"
+          }
+        ]
+      }
+    }
+  }
+]

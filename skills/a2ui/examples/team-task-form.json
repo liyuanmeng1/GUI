@@ -1,0 +1,115 @@
+[
+  {
+    "createSurface": {
+      "surfaceId": "team-task-create-form",
+      "catalogId": "https://a2ui.org/specification/v0_9/basic_catalog.json",
+      "theme": {}
+    }
+  },
+  {
+    "updateComponents": {
+      "surfaceId": "team-task-create-form",
+      "components": [
+        {
+          "id": "root",
+          "component": "Column",
+          "children": [
+            "form-header",
+            "field-title",
+            "field-assignee",
+            "field-priority",
+            "field-description",
+            "action-row"
+          ]
+        },
+        {
+          "id": "form-header",
+          "component": "Text",
+          "text": "创建任务",
+          "variant": "h2"
+        },
+        {
+          "id": "field-title",
+          "component": "TextField",
+          "label": "任务标题 *",
+          "variant": "shortText",
+          "placeholder": "请输入任务标题",
+          "value": { "path": "/form/title" }
+        },
+        {
+          "id": "field-assignee",
+          "component": "TextField",
+          "label": "执行人 *",
+          "variant": "shortText",
+          "placeholder": "请输入用户名（如 wangyihan）",
+          "value": { "path": "/form/assignee" }
+        },
+        {
+          "id": "field-priority",
+          "component": "ChoicePicker",
+          "label": "优先级 *",
+          "variant": "mutuallyExclusive",
+          "choices": [
+            { "label": "最高优", "value": "63" },
+            { "label": "高优", "value": "64" },
+            { "label": "中等", "value": "65" }
+          ],
+          "value": { "path": "/form/priority" }
+        },
+        {
+          "id": "field-description",
+          "component": "TextField",
+          "label": "任务描述",
+          "variant": "longText",
+          "placeholder": "请描述任务内容、背景及目标",
+          "value": { "path": "/form/description" }
+        },
+        {
+          "id": "action-row",
+          "component": "Row",
+          "justify": "end",
+          "children": ["btn-cancel", "btn-submit"]
+        },
+        {
+          "id": "btn-cancel",
+          "component": "Button",
+          "variant": "borderless",
+          "child": "btn-cancel-label",
+          "action": { "event": { "name": "cancel_form" } }
+        },
+        {
+          "id": "btn-cancel-label",
+          "component": "Text",
+          "text": "取消",
+          "variant": "body"
+        },
+        {
+          "id": "btn-submit",
+          "component": "Button",
+          "variant": "primary",
+          "child": "btn-submit-label",
+          "action": { "event": { "name": "submit_task_form" } }
+        },
+        {
+          "id": "btn-submit-label",
+          "component": "Text",
+          "text": "提交",
+          "variant": "body"
+        }
+      ]
+    }
+  },
+  {
+    "updateDataModel": {
+      "surfaceId": "team-task-create-form",
+      "contents": {
+        "form": {
+          "title": "",
+          "assignee": "",
+          "priority": "65",
+          "description": ""
+        }
+      }
+    }
+  }
+]

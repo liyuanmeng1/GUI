@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+dist/
+
+# 测试页面（不纳入 Skill 版本管理）
+example/
+src/
+index.html
+vite.config.js
+package.json
+package-lock.json
+.codeflicker/
