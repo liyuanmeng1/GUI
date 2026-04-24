@@ -6,6 +6,22 @@ version: 1.0.0
 
 # KS-AI-UI Skill
 
+## 🚨 首条强制规则（任何情况不得违反）
+
+**收到用户任何消息后，必须立即执行以下检测，禁止在检测完成前输出任何回复内容：**
+
+```
+1. read_file("01-foundation/dependencies.md")
+2. 判断文件内容是否为空（仅含占位文本视为空）
+   - 若为空 → 加载 00-setup/setup-guide.md，进入 Setup A 引导
+   - 若不为空 → 继续检测 03-design-db/ 规范文件
+3. 检测通过后，才允许输出回复
+```
+
+**违反此规则 = 在未知配置状态下生成代码 = 必然产生错误输出。**
+
+---
+
 ## 角色定义
 
 你是企业级 Web UI 的**首席全链路设计工程师**，同时具备以下三重专业身份：
@@ -40,19 +56,6 @@ version: 1.0.0
 
 ---
 
-## 🔍 Setup 路径标记（用于 Step 4 判断）
-
-当前 Setup 路径将在 `01-foundation/dependencies.md` 文件头部记录：
-
-```markdown
-<!-- Setup Path: A -->  ← 预置主题路径（使用 ThemeProvider）
-<!-- Setup Path: B -->  ← 自定义组件库路径（不使用 ThemeProvider）
-```
-
-**在 Step 4 生成代码时，必须读取此标记**：
-- 如果是 `Setup Path: A`，执行 ThemeProvider 注入流程
-- 如果是 `Setup Path: B`，跳过 ThemeProvider，直接生成页面
-
 ---
 
 ## ⚠️ 执行纪律（任何情况不得违反）
@@ -70,7 +73,7 @@ version: 1.0.0
 **检测逻辑**：当检测到以下任一文件为空时，自动加载 `00-setup/setup-guide.md` 并进入对应的 Setup 引导
 
 - `01-foundation/dependencies.md` 为空 → 进入 Setup A
-- `02-templates/` 下所有模板文件为空 → 进入 Setup B（仅路径 B 需要）
+- `02-templates/` 下所有模板文件为空 → 进入 Setup B（仅路径 A 需要）
 - `03-design-db/` 下所有规范文件为空 → 进入 Setup C
 
 **Setup 引导文件**：`00-setup/setup-guide.md`（包含完整的 Setup A/B/C 引导流程）
@@ -176,113 +179,6 @@ Step 5  交付检查 + 输出交付报告（自查清单 + 设计知识库引用
 3. 原模板文件保持不变
 
 #### ⚠️ 代码生成纪律
-
-**ThemeProvider 自动注入（仅 Setup A 路径）**：
-
-**前置条件检查**：
-- 只有当用户选择了 **Setup A（预置主题）** 路径时，才执行 ThemeProvider 注入
-- 如果用户选择了 **Setup B（自定义组件库）** 路径，跳过此步骤
-
-**首次生成页面时自动执行以下操作**：
-
-1. **复制 ThemeProvider 组件目录**：
-   ```bash
-   # 将完整的 ThemeProvider 组件复制到项目中
-   cp -r templates/ThemeProvider/ src/components/ThemeProvider/
-   ```
-   
-   复制后的目录结构：
-   ```
-   src/components/ThemeProvider/
-   ├── index.tsx              # 主组件
-   ├── ThemeDrawer.tsx        # 抽屉容器
-   ├── PresetSelector.tsx     # 预置主题选择器
-   ├── CustomEditor.tsx       # 自定义参数编辑器
-   ├── presets.ts             # 6 种预置主题配置
-   └── deriveTheme.ts         # 主题推导算法
-   ```
-
-2. **在生成的页面中包裹 ThemeProvider**：
-   
-   **React 项目**：
-   ```tsx
-   import { ThemeProvider } from '@/components/ThemeProvider'
-   
-   export default function PageName() {
-     return (
-       <ThemeProvider>
-         {/* 页面内容 */}
-       </ThemeProvider>
-     )
-   }
-   ```
-   
-   **Vue 3 项目**：
-   ```vue
-   <template>
-     <ThemeProvider>
-       <!-- 页面内容 -->
-     </ThemeProvider>
-   </template>
-   
-   <script setup lang="ts">
-   import ThemeProvider from '@/components/ThemeProvider/index.vue'
-   </script>
-   ```
-
-3. **配置 onSave 回调**（自动保存到 theme.ts）：
-   
-   在 ThemeProvider 的 onSave 中注入保存逻辑：
-   ```tsx
-   <ThemeProvider
-     onSave={async (theme) => {
-       // AI 自动调用 write_to_file 工具
-       // 将主题配置写入 01-foundation/theme.ts
-     }}
-   >
-   ```
-
-4. **首次注入后的交付提示**：
-   ```
-   ✅ 代码已生成
-   
-   文件清单：
-     ✅ src/pages/UserListPage.tsx
-     ✅ src/components/ThemeProvider/  ← 主题编辑器（首次自动注入）
-   
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   
-   💡 提示：页面右下角有主题设置按钮（🎨），可随时切换主题风格
-   
-   功能特性：
-     • 6 种预置主题一键切换
-       （极简留白/专业蓝/自然绿/暗夜模式/复古文艺/科技感）
-     
-     • 自定义关键参数
-       - 主色调：拖动颜色选择器
-       - 圆角风格：方正(2px) / 适中(6px) / 圆润(12px)
-       - 背景模式：明亮 / 暗色
-       - 字号大小：12px / 14px / 16px
-     
-     • 实时预览
-       所有修改立即生效，无需刷新页面
-     
-     • 一键保存
-       点击"保存配置"持久化到 01-foundation/theme.ts
-   
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ```
-
-5. **后续生成页面时**：
-   - 检测 `src/components/ThemeProvider/` 是否存在
-   - 如果已存在，直接引用，不再复制
-   - 在新页面中同样包裹 `<ThemeProvider>`
-   - 交付提示中不再重复说明主题编辑器功能
-
-**⚠️ Setup B 路径（自定义组件库）**：
-- **不注入 ThemeProvider**
-- 直接生成页面，使用用户自己的组件库
-- 主题配置由用户的组件库自行管理
 
 **数据替换原则（必须遵守）**：
 - 模板中的所有示意数据**必须全部替换为业务数据**

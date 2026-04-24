@@ -23,56 +23,79 @@
 ```
 👋 欢迎使用 KS-AI-UI！
 
-我可以帮你快速生成企业级 Web UI 页面代码（列表页、表单页、详情页、看板等）,
-生成的代码可以直接放进你的项目使用。
+我可以帮你快速生成符合团队设计规范的企业级 Web UI 页面代码（列表页、表单页、详情页、看板等），
+生成的代码基于你们自己的组件库，可以直接放进项目使用。
 
 请选择你的使用方式：
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-A. 选择产品主题风格（推荐,快速开始）
+⭐ A. 接入团队组件库（推荐）
 
-从预置风格中选择一种,或描述你想要的视觉风格：
+生成的页面将 100% 基于你的团队组件库，符合产品设计规范，可直接交付使用。
+💬 有任何使用问题可联系 liyuanmeng05
 
-  [ 1. 🤍 极简留白 ]  [ 2. 🔵 专业蓝 ]  [ 3. 🌿 自然绿 ]
-  [ 4. 🌙 暗夜模式 ]  [ 5. 📜 复古文艺 ]  [ 6. ⚡ 科技感 ]
+请提供以下信息：
 
-也可以自定义描述,例如：
-"简洁现代,主色用品牌橙" / "中国风,红色系" / "高端商务,金黑配色"
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-B. 使用自己的组件库
-
-如果你已有组件库,请提供以下信息：
-
-  1. 前端框架（React / Vue 3 / 其他）
-  2. 组件库 npm 包名（如 @company/ui、element-plus）
-  3. 组件前缀（如 El、My、Ks,无则填"无"）
-  4. 安装方式（pnpm / npm / yarn,是否有私有 npm 源）
-  5. 引入方式（全量/按需,请粘贴入口文件引入代码）
-  6. 【选填】文档地址
-  7. 【选填】主题配置（JSON 或代码）
+  1. 组件库站点链接（文档地址，如 https://ui.company.com）
+  2. npm 安装方式（如 pnpm add @company/ui）
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-输入 1-6 选择预置主题,或直接描述你的风格,或输入 B 使用自己的组件库
+B. 快速体验（预置主题）
+
+没有自己的组件库？选一个预置风格先跑起来体验 Skill 的能力，
+⚠️ 注意：预置主题基于 Ant Design，生成的页面仅供体验，不建议直接用于生产。
+
+  [ 1. 🔵 专业蓝 ]  [ 2. 🌙 暗夜模式 ]  [ 3. ⚡ 科技感 ]
+
+也可以自定义描述，例如："简洁现代，主色用品牌橙"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+输入 A 接入团队组件库，或输入 1-3 快速体验预置主题
 ```
 
 ---
 
-### 路径 A：预置主题（推荐）
+### 路径 A：团队组件库（推荐）
+
+**用户提供组件库信息后的流程**：
+
+1. **收集用户提供的信息**：
+   - 组件库站点链接（文档地址）
+   - npm 安装方式
+
+2. **生成并写入文件**：
+   - `01-foundation/dependencies.md` — 基于用户提供信息生成的依赖配置
+     - **文件头部必须包含**：`<!-- Setup Path: A -->`（标记为团队组件库路径）
+   - `01-foundation/theme.ts`（可选）— 如果用户提供了主题配置
+
+3. **同步更新 SKILL.md 开发规范第 1 条**
+
+4. **输出确认信息格式**：
+   - 展示配置摘要（框架/组件库/前缀/安装方式/引入方式/文档）
+   - 列出已生成的文件
+   - 引导进入 Setup B
+
+5. **进入 Setup B**
+
+> ✅ **Setup A（路径 A）完成标志**：`01-foundation/dependencies.md` 已写入且头部包含 `<!-- Setup Path: A -->`,`SKILL.md` 开发规范已更新。
+
+---
+
+### 路径 B：预置主题（快速体验）
 
 **用户选择主题后的完整流程**：
 
 1. **生成主题 Design Token**
-   - 基于用户选择的主题（极简留白/专业蓝/自然绿/暗夜模式/复古文艺/科技感）
+   - 基于用户选择的主题（专业蓝/暗夜模式/科技感）
    - 或基于用户自定义描述,生成一套 Ant Design Design Token 配置
 
 2. **自动写入以下文件**：
    - `01-foundation/theme.ts` — 主题 Design Token（完整的 antd v5 token 配置）
    - `01-foundation/dependencies.md` — React + Ant Design + Pro Components 依赖配置
-     - **文件头部必须包含**：`<!-- Setup Path: A -->`（标记为预置主题路径）
+     - **文件头部必须包含**：`<!-- Setup Path: B -->`（标记为预置主题路径）
    - `02-templates/ProLayout.tsx` — 基于 `@ant-design/pro-layout` 的全局布局
    - `02-templates/ProTablePage.tsx` — 基于 `ProTable` 的列表页模板
    - `02-templates/ProFormPage.tsx` — 基于 `ProForm` 的表单页模板
@@ -89,44 +112,13 @@ B. 使用自己的组件库
 
 5. **Setup B 自动跳过**,直接进入 Setup C
 
-> ✅ **Setup A（路径 A）完成标志**：`01-foundation/` 和 `02-templates/` 下所有文件已写入,`dependencies.md` 头部包含 `<!-- Setup Path: A -->`,`SKILL.md` 开发规范已更新。
-
----
-
-### 路径 B：自定义组件库
-
-**用户提供组件库信息后的流程**：
-
-1. **收集用户提供的信息**：
-   - 前端框架（React / Vue 3 / 其他）
-   - 组件库 npm 包名
-   - 组件前缀
-   - 安装方式
-   - 引入方式（需要完整代码）
-   - 文档地址（选填）
-   - 主题配置（选填）
-
-2. **生成并写入文件**：
-   - `01-foundation/dependencies.md` — 基于用户提供信息生成的依赖配置
-     - **文件头部必须包含**：`<!-- Setup Path: B -->`（标记为自定义组件库路径）
-   - `01-foundation/theme.ts`（可选）— 如果用户提供了主题配置
-
-3. **同步更新 SKILL.md 开发规范第 1 条**
-
-4. **输出确认信息格式**：
-   - 展示配置摘要（框架/组件库/前缀/安装方式/引入方式/文档）
-   - 列出已生成的文件
-   - 引导进入 Setup B
-
-5. **进入 Setup B**
-
-> ✅ **Setup A（路径 B）完成标志**：`01-foundation/dependencies.md` 已写入且头部包含 `<!-- Setup Path: B -->`,`SKILL.md` 开发规范已更新。
+> ✅ **Setup A（路径 B）完成标志**：`01-foundation/` 和 `02-templates/` 下所有文件已写入,`dependencies.md` 头部包含 `<!-- Setup Path: B -->`,`SKILL.md` 开发规范已更新。
 
 ---
 
 ## Setup B：页面模板录入
 
-**触发条件**：仅在路径 B（自定义组件库）时执行,路径 A 自动跳过。
+**触发条件**：仅在路径 A（团队组件库）时执行，路径 B（预置主题）自动跳过。
 
 ### 引导语
 
@@ -412,28 +404,9 @@ Setup A、B、C 全部完成后,输出最终确认信息：
 
 ## 预置主题 Design Token 配置参考
 
-以下是 6 种预置主题的 Design Token 配置（供 AI 生成时参考）：
+以下是 3 种预置主题的 Design Token 配置（供 AI 生成时参考）：
 
-### 1. 极简留白
-
-```typescript
-{
-  token: {
-    colorPrimary: '#000000',
-    colorSuccess: '#52C41A',
-    colorWarning: '#FAAD14',
-    colorError: '#FF4D4F',
-    colorInfo: '#000000',
-    colorLink: '#000000',
-    colorTextBase: '#000000',
-    colorBgBase: '#FFFFFF',
-    fontSize: 14,
-    borderRadius: 2
-  }
-}
-```
-
-### 2. 专业蓝
+### 1. 专业蓝
 
 ```typescript
 {
@@ -452,26 +425,7 @@ Setup A、B、C 全部完成后,输出最终确认信息：
 }
 ```
 
-### 3. 自然绿
-
-```typescript
-{
-  token: {
-    colorPrimary: '#00B96B',
-    colorSuccess: '#52C41A',
-    colorWarning: '#FAAD14',
-    colorError: '#FF4D4F',
-    colorInfo: '#00B96B',
-    colorLink: '#00B96B',
-    colorTextBase: '#000000',
-    colorBgBase: '#FFFFFF',
-    fontSize: 14,
-    borderRadius: 8
-  }
-}
-```
-
-### 4. 暗夜模式
+### 2. 暗夜模式
 
 ```typescript
 {
@@ -491,27 +445,7 @@ Setup A、B、C 全部完成后,输出最终确认信息：
 }
 ```
 
-### 5. 复古文艺
-
-```typescript
-{
-  token: {
-    colorPrimary: '#8B5E3C',
-    colorSuccess: '#5A7A52',
-    colorWarning: '#C4903A',
-    colorError: '#A63D2F',
-    colorInfo: '#8B5E3C',
-    colorLink: '#8B5E3C',
-    colorTextBase: '#2C1A0E',
-    colorBgBase: '#FAF6EF',
-    fontFamily: "Georgia, 'Times New Roman', serif",
-    fontSize: 14,
-    borderRadius: 4
-  }
-}
-```
-
-### 6. 科技感
+### 3. 科技感
 
 ```typescript
 {
