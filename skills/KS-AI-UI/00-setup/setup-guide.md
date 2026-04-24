@@ -47,7 +47,7 @@ B. 快速体验（预置主题）
 没有自己的组件库？选一个预置风格先跑起来体验 Skill 的能力，
 ⚠️ 注意：预置主题基于 Ant Design，生成的页面仅供体验，不建议直接用于生产。
 
-  [ 1. 🔵 专业蓝 ]  [ 2. 🌙 暗夜模式 ]  [ 3. ⚡ 科技感 ]
+  [ 1. 🔵 专业蓝 ]  [ 2. 📜 复古文艺 ]  [ 3. ⚡ 科技感 ]
 
 也可以自定义描述，例如："简洁现代，主色用品牌橙"
 
@@ -89,7 +89,7 @@ B. 快速体验（预置主题）
 **用户选择主题后的完整流程**：
 
 1. **生成主题 Design Token**
-   - 基于用户选择的主题（专业蓝/暗夜模式/科技感）
+   - 基于用户选择的主题（专业蓝/复古文艺/科技感）
    - 或基于用户自定义描述,生成一套 Ant Design Design Token 配置
 
 2. **自动写入以下文件**：
@@ -425,23 +425,23 @@ Setup A、B、C 全部完成后,输出最终确认信息：
 }
 ```
 
-### 2. 暗夜模式
+### 2. 复古文艺
 
 ```typescript
 {
   token: {
-    colorPrimary: '#4F9EFF',
-    colorSuccess: '#73D13D',
-    colorWarning: '#FFC53D',
-    colorError: '#FF7875',
-    colorInfo: '#4F9EFF',
-    colorLink: '#4F9EFF',
-    colorTextBase: '#FFFFFF',
-    colorBgBase: '#141414',
+    colorPrimary: '#8B5E3C',
+    colorSuccess: '#5A7A52',
+    colorWarning: '#C4903A',
+    colorError: '#A63D2F',
+    colorInfo: '#8B5E3C',
+    colorLink: '#8B5E3C',
+    colorTextBase: '#2C1A0E',
+    colorBgBase: '#FAF6EF',
+    fontFamily: "Georgia, 'Times New Roman', serif",
     fontSize: 14,
-    borderRadius: 6
-  },
-  algorithm: 'darkAlgorithm' // antd v5 暗色算法
+    borderRadius: 4
+  }
 }
 ```
 
